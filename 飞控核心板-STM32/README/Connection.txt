@@ -1,0 +1,39 @@
+硬件管脚口连接：
+电机四路pwm输出：
+			PWM1->PB6	TIM4_CH1
+			PWM2->PB7	TIM4_CH2
+			PWM3->PB8	TIM4_CH3
+			PWM4->PB9	TIM4_CH4
+MPU6050连接电路：
+	硬件IIC通讯模式：
+			SDA->PB11	IIC2
+			SCL->PB10
+四路按键控制：
+			KEY0->PC13
+一路蜂鸣器报警：
+			FMQ->PB0	TIM3_CH3
+电源测压模块
+			ADC_CH1		PA1
+nrf无线传输：
+			NRF_CE		PA4
+			SPI1_SCK	PA5
+			SPI1_MISO	PA6
+			SPI1_MOSI	PA7
+			NRF_CS		PC4
+			NRF_IQR		B3
+SD卡模块：
+			SD_CS		PC5(与NRF管脚口不同)
+			SPI1_SCK	PA5
+			SPI1_MISO	PA6
+			SPI1_MOSI	PA7
+SPL-06气压计模块：
+			SDA			PB11
+			SCL			PB10
+超声波模块：
+			TRIG		B14
+			ECHO		B15
+四个LED指示灯：
+			LED0		A8
+			LED1		A9
+			LED2		A10
+			LED3		A11

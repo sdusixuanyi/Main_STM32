@@ -1,0 +1,131 @@
+外部函数汇总，总结各个硬件驱动文件里面可以供外部函数调用的外部函数，便于观察总结。
+
+Beep.c
+	void Beep_Init(void);				//蜂鸣器初始化函数
+	void Beep_ON(u8 mode,u8 num);		//打开蜂鸣器并按照mode（1,2,3）和num1~7进行选择
+	void Beep_OFF(void );				//关闭蜂鸣器
+
+LED.c
+	void LED_Init(void);				//初始化
+	void LED_ON(u8 num);				//num=0\1\2\3,turn on the right LED;4 turn on all led;else delay_ms(10)
+	void LED_OFF(u8 num);				//num=0\1\2\3,turn off the right LED;4 turn off all led;else delay_ms(10)
+
+Key.c
+	void KEY_Init(void);				//IO初始化
+	u8 KEY_Scan(u8 mode);  				//按键扫描函数，返回某个按键是否被按下
+	
+PWM.c
+	void TIM4_PWM_Init(u16 arr,u16 psc);//初始化函数，输入分频因子和分频数
+	void TIM4_CH1_Duty(u16 duty);		//设置通道1占空比
+	void TIM4_CH2_Duty(u16 duty);		//设置通道2占空比
+	void TIM4_CH3_Duty(u16 duty);		//设置通道3占空比
+	void TIM4_CH4_Duty(u16 duty);		//设置通道4占空比
+
+adc.c
+	void Adc_Init(void);				//初始化函数，将ADC—CH1通道初始化
+	u16  Get_Adc(u8 ch);				//得到一次ADC采集的值，ch为通道号1
+	u16 Get_Adc_Average(u8 ch,u8 times);//求取五次采样的平均值，ch为通道号1
+
+24l01.c
+	void NRF24L01_Init(void);			//初始化
+	void NRF24L01_RX_Mode(void);		//配置为接收模式
+	void NRF24L01_TX_Mode(void);		//配置为发送模式
+	u8 NRF24L01_Check(void);			//检查24L01是否存在
+	u8 NRF24L01_TxPacket(u8 *txbuf);	//发送一个包的数据txbuf发送数据的首地址
+	u8 NRF24L01_RxPacket(u8 *rxbuf);	//接收一个包的数据rxbuf待接收数据首地址
+
+dma.c
+	void dma_init(void);				//初始化
+	void dma_nvic_init(void);			//dma中断配置初始化
+
+HCSR04.c
+	void HCSR04_Init(void);				//初始化超声波模块
+	void HCSR04_Run(void);				//开始运行超声波并进行一次测试
+	float HCSR04_Distance=0.0;			//距离记录变量，每次触发超声波模块之后值会进行更改，可以在包含头文件以后直接调用
+
+1.<main.c>
+
+变量说明 
+raw_data[14]：从6050读取的原始数据，共7组数据，每组数据2字节（高8位和低8位），二进制，从0到13具体为xyz轴的加速度分量，温度，xyz轴的角速度，每组高低位相连，依次排列。
+translated_data[14]：raw_data[14]中的7组数据高低位合并之后存在这里，排列次序不变，具体实现过程见函数MPU6050_data_translation()
+
+函数说明   无
+
+
+
+2.<flight_control.c & .h>
+
+变量说明
+
+PID_pitch & PID_roll & PID_yaw & PID_gyro_x & PID_gyro_y & PID_gyro_z & PID_height ：PID_parameter型结构体变量，用于存储PID控制的参数，各自含有三个成员Kp  Ki  Kd
+
+Set ：结构体变量，用于存储控制的目标值，下设7个成员，分别为gyro_xyz & pitch & roll & yaw & height
+
+offset ：结构体变量，用于存储6050静止时的读数，减小偏差，下设6个成员gyro_xyz & pitch & roll & yaw
+
+attitude ：结构体变量，用于存储飞行器当前姿态，下设7个成员，分别为gyro_xyz & pitch & roll & yaw & height
+
+NumQ ：结构体变量，存四元数，4成员，q0 & q1 & q2 & q3
+
+GyroIntegError ：结构体变量，姿态解算中间变量，3成员，分别为xyz
+
+kalman_accel_xyz ：结构体变量，存卡尔曼滤波所需数据，4成员，分别为last_p, Q, R, output
+
+err[ERR_STORE_NUM] ：结构体数组，存最近ERR_STORE_NUM个目标值和测量值之间的差，7成员，分别为三轴姿态角、三轴角速度、高度偏差
+
+err_acc ：结构体变量存最近ERR_STORE_NUM个偏差之和，7成员，分别为三轴姿态角、三轴角速度、高度偏差
+
+store_pos ：用于标记该轮偏差存储位置，其值在0到ERR_STORE_NUM - 1之间循环
+
+motor_duty[4] ：四个电机的占空比输出，电机编码：飞机平放头朝自己，俯视下逆时针编号0123,01为头，23为尾
+
+motor_delta_duty[4] ：每轮计算下来的pwm占空比增量，最终输出的占空比为上一轮输出的占空比 + motor_delta_duty[i]
+
+外部调用变量：raw_data    translated_data
+
+
+函数说明
+
+flight_control()：飞行总函数，集成了姿态读取，姿态解算和PID计算
+
+MPU6050_get_offset：获取6050静止时的读数，上电后调用一次即可
+
+Attitude_process(int mode)：姿态读取，解算，mode用于选择是普通读取还是dma读取
+
+Get_angle(struct Attitude_float *addr, float dt)：解算姿态角
+
+duty_runout_adjustment()：占空比溢出调整，当一个或多个电机占空比溢出时在不改变其内部相对大小的情况缩放占空比
+
+flight_control_debug(int mode, float set_value)：单轴整定PID参量，实质上是将flight_control按各个维度拆分，根据调试需要执行相应部分。mode选择调试对象，set_value设定目标值
+
+float limit(float target_value, float max, float min)：限幅函数，输入限幅对象，上限，下限即返回限幅后的值。
+
+
+
+3.<MUP6050.h & .c>
+
+变量说明
+
+外部调用变量：raw_data    translated_data
+
+
+函数说明
+
+MPU6050_init(void)：初始化函数
+
+MPU6050_get_data(unsigned char* addr)：非dma方式读取数据
+
+MPU6050_data_translation(unsigned char* raw_addr, short int* translation_addr)：将14个6050原始数据合并为7个数据，输出仍为二进制
+
+MPU6050_dma_read(unsigned char slave_addr, unsigned char reg_addr)：dma方式读取数据
+
+int MPU6050_check(void)：自检程序，用于检验6050是否初始化成功，运行时需让飞机静止，若6050数据正常则返回1，异常返回0
+
+4.<kalman.c & .h>
+
+变量说明 无
+
+函数说明
+
+kalman_filter(struct Kalman_data * addr, float input)：一维卡尔曼滤波，第一个参数为滤波所需参数，第二个为本次滤波的输入量
+

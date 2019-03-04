@@ -7,6 +7,8 @@
 #include "dma.h"
 #include "timer.h"
 #include "hcsr04.h"
+#include "i2c.h"
+#include "mpu6050.h"
 
 
 unsigned char raw_data[14] = {0};

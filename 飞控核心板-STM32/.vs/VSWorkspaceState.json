@@ -1,8 +1,9 @@
 {
   "ExpandedNodes": [
     "",
-    "\\USER\\Listings"
+    "\\HARDWEAR",
+    "\\HARDWEAR\\scr"
   ],
-  "SelectedNode": "\\USER",
+  "SelectedNode": "\\HARDWEAR\\scr\\stmflash.c",
   "PreviewInSolutionExplorer": false
 }

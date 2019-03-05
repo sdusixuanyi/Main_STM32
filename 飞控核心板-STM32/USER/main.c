@@ -9,12 +9,17 @@
 #include "hcsr04.h"
 #include "i2c.h"
 #include "mpu6050.h"
+#include "rtc.h"
+#include "stmflash.h"
+#include "iwdg.h"
 
 
 unsigned char raw_data[14] = {0};
 short int translated_data[7];
 float accel[3];         
 float gyro[3];
+//u8 TEXT_Buffer[10] = { "0123456789" };
+
 
 void Init()
 {
@@ -29,6 +34,8 @@ void Init()
 	i2c_init();
 	MPU6050_init();
 	dma_init(); 
+	while(RTC_Init ())
+	IWDG_Init(4,625);
 	timer3_init();
 }
 

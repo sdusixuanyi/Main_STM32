@@ -39,3 +39,13 @@
 ..\obj\main.o: ..\SYSTEM\usart\usart.h
 ..\obj\main.o: D:\keil\ARM\ARMCC\Bin\..\include\stdio.h
 ..\obj\main.o: ..\HARDWEAR\inc\hcsr04.h
+..\obj\main.o: ..\HARDWEAR\inc\i2c.h
+..\obj\main.o: D:\keil\ARM\ARMCC\Bin\..\include\math.h
+..\obj\main.o: ..\HARDWEAR\inc\mpu6050.h
+..\obj\main.o: ..\MATH\inc\myMath.h
+..\obj\main.o: ..\MATH\inc\flight_control.h
+..\obj\main.o: ..\MATH\inc\kalman.h
+..\obj\main.o: ..\HARDWEAR\inc\mpu6050.h
+..\obj\main.o: ..\HARDWEAR\inc\rtc.h
+..\obj\main.o: ..\HARDWEAR\inc\stmflash.h
+..\obj\main.o: ..\HARDWEAR\inc\iwdg.h

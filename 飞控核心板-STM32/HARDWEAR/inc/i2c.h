@@ -5,7 +5,8 @@
 #include "math.h"
 
 #define I2C1_OWN_ADDRESS 0x0A
-#define I2C_Speed        400000               //初始化中设置的传输速率
+#define I2C2_OWN_ADDRESS 0x0A
+#define I2C_Speed        200000               //初始化中设置的传输速率
 
 void i2c_init(void);
 

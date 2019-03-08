@@ -2,7 +2,7 @@
 ..\obj\kalman.o: ..\MATH\inc\kalman.h
 ..\obj\kalman.o: ..\USER\stm32f10x.h
 ..\obj\kalman.o: ..\CORE\core_cm3.h
-..\obj\kalman.o: D:\keil\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\kalman.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\kalman.o: ..\USER\system_stm32f10x.h
 ..\obj\kalman.o: ..\USER\stm32f10x_conf.h
 ..\obj\kalman.o: ..\STM32F10X_FWLib\inc\stm32f10x_adc.h
@@ -29,4 +29,4 @@
 ..\obj\kalman.o: ..\STM32F10X_FWLib\inc\stm32f10x_usart.h
 ..\obj\kalman.o: ..\STM32F10X_FWLib\inc\stm32f10x_wwdg.h
 ..\obj\kalman.o: ..\STM32F10X_FWLib\inc\misc.h
-..\obj\kalman.o: D:\keil\ARM\ARMCC\Bin\..\include\math.h
+..\obj\kalman.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h

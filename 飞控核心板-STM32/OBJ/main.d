@@ -1,7 +1,7 @@
 ..\obj\main.o: main.c
 ..\obj\main.o: stm32f10x.h
 ..\obj\main.o: ..\CORE\core_cm3.h
-..\obj\main.o: D:\keil\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\main.o: system_stm32f10x.h
 ..\obj\main.o: stm32f10x_conf.h
 ..\obj\main.o: ..\STM32F10X_FWLib\inc\stm32f10x_adc.h
@@ -37,10 +37,10 @@
 ..\obj\main.o: ..\HARDWEAR\inc\dma.h
 ..\obj\main.o: ..\HARDWEAR\inc\timer.h
 ..\obj\main.o: ..\SYSTEM\usart\usart.h
-..\obj\main.o: D:\keil\ARM\ARMCC\Bin\..\include\stdio.h
+..\obj\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 ..\obj\main.o: ..\HARDWEAR\inc\hcsr04.h
 ..\obj\main.o: ..\HARDWEAR\inc\i2c.h
-..\obj\main.o: D:\keil\ARM\ARMCC\Bin\..\include\math.h
+..\obj\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 ..\obj\main.o: ..\HARDWEAR\inc\mpu6050.h
 ..\obj\main.o: ..\MATH\inc\myMath.h
 ..\obj\main.o: ..\MATH\inc\flight_control.h
@@ -49,3 +49,4 @@
 ..\obj\main.o: ..\HARDWEAR\inc\rtc.h
 ..\obj\main.o: ..\HARDWEAR\inc\stmflash.h
 ..\obj\main.o: ..\HARDWEAR\inc\iwdg.h
+..\obj\main.o: ..\HARDWEAR\inc\spl06.h

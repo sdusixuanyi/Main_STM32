@@ -2,7 +2,7 @@
 ..\obj\mpu6050.o: ..\HARDWEAR\inc\mpu6050.h
 ..\obj\mpu6050.o: ..\USER\stm32f10x.h
 ..\obj\mpu6050.o: ..\CORE\core_cm3.h
-..\obj\mpu6050.o: D:\keil\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\mpu6050.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\mpu6050.o: ..\USER\system_stm32f10x.h
 ..\obj\mpu6050.o: ..\USER\stm32f10x_conf.h
 ..\obj\mpu6050.o: ..\STM32F10X_FWLib\inc\stm32f10x_adc.h
@@ -29,7 +29,7 @@
 ..\obj\mpu6050.o: ..\STM32F10X_FWLib\inc\stm32f10x_usart.h
 ..\obj\mpu6050.o: ..\STM32F10X_FWLib\inc\stm32f10x_wwdg.h
 ..\obj\mpu6050.o: ..\STM32F10X_FWLib\inc\misc.h
-..\obj\mpu6050.o: D:\keil\ARM\ARMCC\Bin\..\include\math.h
+..\obj\mpu6050.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 ..\obj\mpu6050.o: ..\HARDWEAR\inc\i2c.h
 ..\obj\mpu6050.o: ..\MATH\inc\myMath.h
 ..\obj\mpu6050.o: ..\MATH\inc\flight_control.h

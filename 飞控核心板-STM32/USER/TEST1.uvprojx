@@ -598,6 +598,11 @@
               <FileType>1</FileType>
               <FilePath>..\HARDWEAR\scr\stmflash.c</FilePath>
             </File>
+            <File>
+              <FileName>spl06.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWEAR\scr\spl06.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

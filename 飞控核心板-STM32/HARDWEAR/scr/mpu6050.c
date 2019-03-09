@@ -3,6 +3,11 @@
 extern unsigned char raw_data[14];
 extern short int translated_data[7];     //将6050的原始14个数据化为7个二进制数据，前三个是加速度分别在xyz上的分量，最后三个是角速度，中间的是温度
 
+extern int dma_flag;
+extern float accel[3];         
+extern float gyro[3];
+float data[7] = {0};
+
 void MPU6050_init(void)
 {
 	i2c_byte_write(MPU6050_ADDRESS, MPU6050_RA_PWR_MGMT_1, 0x00);         //reg107,唤醒，8M内部时钟源
@@ -32,14 +37,14 @@ void MPU6050_data_translation(unsigned char* raw_addr, short int* translation_ad
 		//translated_data[i] = (raw_data[2*i] << 8) + raw_data[2*i + 1];
 	}
 	
-// 	for(i = 0 ; i < 3 ; i ++)
-// 	{
-// 		if(translated_data[i] >= 0)  accel[i] = ((float)translated_data[i] / (float)32767) * ACCEL_RANGE;        //加速度换算
-// 		else                         accel[i] = ((float)translated_data[i] / (float)32768) * ACCEL_RANGE;
-// 		
-// 		if(translated_data[i + 4] >= 0)   gyro[i] = (0 - ((float)translated_data[i + 4] / (float)32767) * GYRO_RANGE) - Sta_gyro[i];   //角速度换算
-// 		else                              gyro[i] = (0 - ((float)translated_data[i + 4] / (float)32768) * GYRO_RANGE) - Sta_gyro[i];		
-// 	}
+ 	for(i = 0 ; i < 3 ; i ++)
+ 	{
+ 		if(translated_data[i] >= 0)  accel[i] = ((float)translated_data[i] / (float)32767) * ACCEL_RANGE;        //加速度换算
+ 		else                         accel[i] = ((float)translated_data[i] / (float)32768) * ACCEL_RANGE;
+ 		
+ 		if(translated_data[i + 4] >= 0)   gyro[i] = (0 - ((float)translated_data[i + 4] / (float)32767) * GYRO_RANGE);   //角速度换算
+ 		else                              gyro[i] = (0 - ((float)translated_data[i + 4] / (float)32768) * GYRO_RANGE);		
+ 	}
 	
 	
 }
@@ -50,42 +55,18 @@ void MPU6050_dma_read(unsigned char slave_addr, unsigned char reg_addr)
 {
 	//static int count = 0;
 	int wait_num = 0;
-	//int i;
-	//GPIO_Write(GPIOF, 0xff00);
-	
-// 	if(count == 0)
-// 	{
-// 		printf("count = 0\n");
-// 		printf("CR1 = %x\n", I2C_ReadRegister(I2C1, I2C_Register_CR1));
-// 		printf("CR2 = %x\n", I2C_ReadRegister(I2C1, I2C_Register_CR2));
-// 	  printf("SR1 = %x\n", I2C_ReadRegister(I2C1, I2C_Register_SR1));
-// 		printf("SR2 = %x\n\n", I2C_ReadRegister(I2C1, I2C_Register_SR2));
-// 		for(i = 0 ; i <= 13 ; i++)
-// 		{
-// 			printf("raw[i]= %d ", raw_data[i]);
-// 		}
-// 		printf("\n\n");
-// 	}
+
 	
 	
+  DMA_Cmd(DMA1_Channel5, DISABLE);               //关闭I2C的DMA通道	
+  DMA_SetCurrDataCounter(DMA1_Channel5, 14);     //重设传输数14，必须在关闭DMA相应通道后才能设，在非循环模式下每次传输完成后该值将归0！
 	
-  DMA_Cmd(DMA1_Channel7, DISABLE);               //关闭I2C的DMA通道	
-  DMA_SetCurrDataCounter(DMA1_Channel7, 14);     //重设传输数14，必须在关闭DMA相应通道后才能设，在非循环模式下每次传输完成后该值将归0！
-	
-  while(I2C_GetFlagStatus(I2C1, I2C_FLAG_BUSY))    //等待空闲
+  while(I2C_GetFlagStatus(I2C2, I2C_FLAG_BUSY))    //等待空闲
 	{
 		wait_num++;
 
 		if(wait_num > 5000)
 		{			
-// 			if(usart1_permission)
-// 			{
-// 				printf("count = %d:  bus locked busy\n", count);
-// 			  printf("CR1 = %x\n", I2C_ReadRegister(I2C1, I2C_Register_CR1));
-// 		    printf("CR2 = %x\n", I2C_ReadRegister(I2C1, I2C_Register_CR2));
-// 		    printf("SR1 = %x\n", I2C_ReadRegister(I2C1, I2C_Register_SR1));
-// 		    printf("SR2= %x\n\n", I2C_ReadRegister(I2C1, I2C_Register_SR2));
-// 			}
 			return;
 		}
 	}
@@ -93,29 +74,29 @@ void MPU6050_dma_read(unsigned char slave_addr, unsigned char reg_addr)
   //printf("count: %d  pass on!!\n", count);
 	
 	
-  I2C_DMALastTransferCmd(I2C1, ENABLE);                    //原注释：Note this one, very important   编写者：不明所以的操作(貌似自动产生nack信号)
+  I2C_DMALastTransferCmd(I2C2, ENABLE);                    //原注释：Note this one, very important   编写者：不明所以的操作(貌似自动产生nack信号)
 	
-  I2C_GenerateSTART(I2C1, ENABLE);                                //发送开始信号
-  while(!I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_MODE_SELECT));     //EV5
+  I2C_GenerateSTART(I2C2, ENABLE);                                //发送开始信号
+  while(!I2C_CheckEvent(I2C2, I2C_EVENT_MASTER_MODE_SELECT));     //EV5
 
-  I2C_Send7bitAddress(I2C1, slave_addr, I2C_Direction_Transmitter);     //发送从机地址，发送者模式
-  while(!I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED));  //EV6
+  I2C_Send7bitAddress(I2C2, slave_addr, I2C_Direction_Transmitter);     //发送从机地址，发送者模式
+  while(!I2C_CheckEvent(I2C2, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED));  //EV6
 
-  I2C_Cmd(I2C1, ENABLE);                                               //用重新使能的方式清空EV6
+  I2C_Cmd(I2C2, ENABLE);                                               //用重新使能的方式清空EV6
 
-  I2C_SendData(I2C1, reg_addr);                                           //读取的地址
-  while(!I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_BYTE_TRANSMITTED));    //EV8
+  I2C_SendData(I2C2, reg_addr);                                           //读取的地址
+  while(!I2C_CheckEvent(I2C2, I2C_EVENT_MASTER_BYTE_TRANSMITTED));    //EV8
 
-  I2C_GenerateSTART(I2C1, ENABLE);
-  while(!I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_MODE_SELECT));         //EV5
+  I2C_GenerateSTART(I2C2, ENABLE);
+  while(!I2C_CheckEvent(I2C2, I2C_EVENT_MASTER_MODE_SELECT));         //EV5
 
-  I2C_Send7bitAddress(I2C1, slave_addr, I2C_Direction_Receiver);       //发送从机地址，接收模式
-  while(!I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED));    //EV6
+  I2C_Send7bitAddress(I2C2, slave_addr, I2C_Direction_Receiver);       //发送从机地址，接收模式
+  while(!I2C_CheckEvent(I2C2, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED));    //EV6
 
   /* Start DMA to receive data from I2C */
-  DMA_Cmd(DMA1_Channel7, ENABLE);
-  I2C_DMACmd(I2C1, ENABLE);
-	
+  DMA_Cmd(DMA1_Channel5, ENABLE);
+  I2C_DMACmd(I2C2, ENABLE);
+	dma_flag = 0;
 	//if(count == 0 || usart1_permission)  printf("count = %d  I2C request out\n\n", count);
 	
 	//count ++;
@@ -128,7 +109,7 @@ void MPU6050_dma_read(unsigned char slave_addr, unsigned char reg_addr)
 
 int MPU6050_check()
 {
-	long long int count;
+	long long int count = 0;
 	int i, j;
 	
 	for(i = 0 ; i < 100 ; i ++)
@@ -137,10 +118,16 @@ int MPU6050_check()
 		
 		MPU6050_data_translation(raw_data, translated_data);
 		
+//		for(j = 0 ; j <= 2 ; j++)    
+//		{
+//			data[j] = (float)translated_data[j] * 4 / 32768;   //将加速度化为十进制
+//			count += 0;//translated_data[i];
+//		}
+		
 		for(j = 4 ; j <= 6 ; j++)    
 		{
-			translated_data[i] = translated_data[i] * Gyro_G;   //将角速度化为十进制
-			count += translated_data[i];
+			data[j] = (float)translated_data[j] * Gyro_G;   //将角速度化为十进制
+			count += data[j];
 		}
 	}
 	

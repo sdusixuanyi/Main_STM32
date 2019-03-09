@@ -1,7 +1,6 @@
 #ifndef _FLIGHT_H_
 #define _FLIGHT_H_
 
-//#include "i2c.h"
 #include "kalman.h"
 #include "mpu6050.h"
 #include "myMath.h"

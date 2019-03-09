@@ -4,7 +4,9 @@
 	HARDWEAR		硬件模块驱动文件
 	OBJ				系统生成的临时文件
 	README			为该工程系统所编写的必要的工程备注
-	STM32F10X_FWLib	底层驱动文件，链接硬件驱动和内核底层
+	STM32F10X_FWLib		底层驱动文件，链接硬件驱动和内核底层
 	SYSTEM			系统必备的一些文件
 	USER			用户文件，主要是用户调用执行函数的相关文件
-	keilkilll.bat	删除临时文件
+	keilkilll.bat		删除临时文件
+	MALLOC			SD卡内存分配文件，用来分配SD卡内存池
+	FATFS			文件系统，便于利用最新的文件协议书写文件，便于操作

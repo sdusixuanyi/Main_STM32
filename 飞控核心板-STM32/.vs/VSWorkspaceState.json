@@ -2,8 +2,11 @@
   "ExpandedNodes": [
     "",
     "\\HARDWEAR",
-    "\\HARDWEAR\\scr"
+    "\\HARDWEAR\\scr",
+    "\\MATH",
+    "\\MATH\\inc",
+    "\\MATH\\scr"
   ],
-  "SelectedNode": "\\HARDWEAR\\scr\\stmflash.c",
+  "SelectedNode": "\\HARDWEAR\\scr\\HCSR04.c",
   "PreviewInSolutionExplorer": false
 }

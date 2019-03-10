@@ -2,13 +2,6 @@
 #define __24L01_H	 		  
 #include "sys.h"   
 
-/**************外部调用函数*****************/
-void NRF24L01_Init(void);//初始化
-void NRF24L01_RX_Mode(void);//配置为接收模式
-void NRF24L01_TX_Mode(void);//配置为发送模式
-u8 NRF24L01_Check(void);//检查24L01是否存在
-u8 NRF24L01_TxPacket(u8 *txbuf);//发送一个包的数据txbuf发送数据的首地址
-u8 NRF24L01_RxPacket(u8 *rxbuf);//接收一个包的数据rxbuf待接收数据首地址
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 //NRF24L01寄存器操作命令
 #define NRF_READ_REG    0x00  //读配置寄存器,低5位为寄存器地址
@@ -54,8 +47,8 @@ u8 NRF24L01_RxPacket(u8 *rxbuf);//接收一个包的数据rxbuf待接收数据首地址
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 //24L01操作线
 #define NRF24L01_CE   PAout(4) //24L01片选信号
-#define NRF24L01_CSN  PCout(4) //SPI片选信号	   
-#define NRF24L01_IRQ  PAin(1)  //IRQ主机数据输入
+#define NRF24L01_CSN  PBout(0) //SPI片选信号	   
+#define NRF24L01_IRQ  PBin(3)  //IRQ主机数据输入
 //24L01发送接收数据宽度定义
 #define TX_ADR_WIDTH    5   	//5字节的地址宽度
 #define RX_ADR_WIDTH    5   	//5字节的地址宽度
@@ -63,13 +56,16 @@ u8 NRF24L01_RxPacket(u8 *rxbuf);//接收一个包的数据rxbuf待接收数据首地址
 #define RX_PLOAD_WIDTH  32  	//32字节的用户数据宽度
 									   	   
 
-
-
+void NRF24L01_Init(void);//初始化
+void NRF24L01_RX_Mode(void);//配置为接收模式
+void NRF24L01_TX_Mode(void);//配置为发送模式
 u8 NRF24L01_Write_Buf(u8 reg, u8 *pBuf, u8 u8s);//写数据区
 u8 NRF24L01_Read_Buf(u8 reg, u8 *pBuf, u8 u8s);//读数据区		  
 u8 NRF24L01_Read_Reg(u8 reg);			//读寄存器
 u8 NRF24L01_Write_Reg(u8 reg, u8 value);//写寄存器
-
+u8 NRF24L01_Check(void);//检查24L01是否存在
+u8 NRF24L01_TxPacket(u8 *txbuf);//发送一个包的数据
+u8 NRF24L01_RxPacket(u8 *rxbuf);//接收一个包的数据
 #endif
 
 

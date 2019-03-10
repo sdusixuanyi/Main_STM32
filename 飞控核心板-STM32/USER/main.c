@@ -33,10 +33,10 @@ void Init()
 	//HCSR04_Init();
 //	Beep_Init();
 	//TIM4_PWM_Init(8999,7);//PWM=72000/8/(8999+1)=500hz 
-	i2c_init();
-	SPL06_init();
-	MPU6050_init();
-	dma_init(); 
+	i2c_init(I2C_SOFTWARE);
+	SPL06_init(SPL06_SOFTWARE);
+	MPU6050_init(MPU6050_SOFTWARE);
+	//dma_init(); 
 	//while(RTC_Init ())
 	//IWDG_Init(4,625);
 	//timer3_init();
@@ -58,9 +58,9 @@ int main(void)
 //	TIM4_CH2_Duty(600);
 //	TIM4_CH3_Duty(600);
 //	TIM4_CH4_Duty(600);	
-    if(dma_flag == 1)  flight_control();
+    flight_control(COMMON_READ, MPU6050_SOFTWARE);
 		
-    SPL06_height_process();			
+    SPL06_height_process(SPL06_SOFTWARE);			
   }
 }
 

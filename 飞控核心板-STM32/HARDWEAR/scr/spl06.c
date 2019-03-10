@@ -5,34 +5,44 @@ struct SPL06_DATA SPL06_data;
 
 int HEIGHT_process_complete = 1;    //1时高度计算完成
 
+struct Kalman_data kalman_height = {0.02, 0.001, 3, 0};
+
 extern struct Attitude_float attitude;
 
-void SPL06_init()
+void SPL06_init(int i2cmode)
 {
 	unsigned char status;
 	//while(!SPL06_check());
 	
-	do i2c_read(SPL06_ADDR, MEAS_CFG_REG, &status, 1);
+	do
+	{
+		if(i2cmode == SPL06_HARDWARE) i2c_read(SPL06_ADDR, MEAS_CFG_REG, &status, 1);
+		else                          i2c_read_soft(SPL06_ADDR, MEAS_CFG_REG, &status, 1);
+	}
 	while((status&MEAS_CFG_COEF_RDY) != MEAS_CFG_COEF_RDY);
 	
-	SPL06_get_calib_param(1);
+	SPL06_get_calib_param(1, i2cmode);
 	
-	do i2c_read(SPL06_ADDR, MEAS_CFG_REG, &status, 1);
+	do
+	{
+		if(i2cmode == SPL06_HARDWARE) i2c_read(SPL06_ADDR, MEAS_CFG_REG, &status, 1);
+		else                          i2c_read_soft(SPL06_ADDR, MEAS_CFG_REG, &status, 1);
+	}
 	while((status&MEAS_CFG_SENSOR_RDY) != MEAS_CFG_SENSOR_RDY);
 	
-	SPL06_set_rate(PRESSURE_SENSOR, 128, 32);   //设置采样率和过采样率
-	SPL06_set_rate(TEMPERATURE_SENSOR, 32, 8);
+	SPL06_set_rate(PRESSURE_SENSOR, 128, 32, i2cmode);   //设置采样率和过采样率
+	SPL06_set_rate(TEMPERATURE_SENSOR, 32, 8, i2cmode);
 	
-	i2c_byte_write(SPL06_ADDR, MEAS_CFG_REG, MEAS_CFG_MEAS_CTR_BACKGROUND_PSR_TMP);     //设置采集模式
-	
+	if(i2cmode == SPL06_HARDWARE) i2c_byte_write(SPL06_ADDR, MEAS_CFG_REG, MEAS_CFG_MEAS_CTR_BACKGROUND_PSR_TMP);     //设置采集模式
+	else                     i2c_byte_write_soft(SPL06_ADDR, MEAS_CFG_REG, MEAS_CFG_MEAS_CTR_BACKGROUND_PSR_TMP);
 	delay_ms(3000);
 	
-	SPL06_info_update();
-	SPL06_info_update();
+	SPL06_info_update(i2cmode);
+	SPL06_info_update(i2cmode);
 	SPL06_data.fGround_Alt = SPL06_data.fALT;    //设定地面的海拔高度
 }
 
-void SPL06_get_raw_data()
+void SPL06_get_raw_data(int i2cmode)
 {
 	//获取温度
   uint8_t u8Data[3] = {0};
@@ -41,7 +51,8 @@ void SPL06_get_raw_data()
 //	i2c_read(SPL06_ADDR, 0x04, &(u8Data[1]), 1);
 //	i2c_read(SPL06_ADDR, 0x05, &(u8Data[2]), 1);
 	
-	i2c_read(SPL06_ADDR, 0x03, u8Data, 3);
+	if(i2cmode == SPL06_HARDWARE) i2c_read(SPL06_ADDR, 0x03, u8Data, 3);
+	else                          i2c_read_soft(SPL06_ADDR, 0x03, u8Data, 3);
 
 	SPL06_data.i32RawTemperature = (int32_t)u8Data[0] << 16 | \
 																				(int32_t)u8Data[1] << 8  | \
@@ -55,7 +66,8 @@ void SPL06_get_raw_data()
 //	i2c_read(SPL06_ADDR, 0x00, &(u8Data[0]), 1);
 //	i2c_read(SPL06_ADDR, 0x01, &(u8Data[1]), 1);
 //	i2c_read(SPL06_ADDR, 0x02, &(u8Data[2]), 1);
-	i2c_read(SPL06_ADDR, 0x00, u8Data, 3);
+	if(i2cmode == SPL06_HARDWARE) i2c_read(SPL06_ADDR, 0x00, u8Data, 3);
+	else                          i2c_read_soft(SPL06_ADDR, 0x00, u8Data, 3);
 	
 	SPL06_data.i32RawPressure = (int32_t)u8Data[0] << 16 | \
 																		 (int32_t)u8Data[1] << 8  | \
@@ -65,16 +77,17 @@ void SPL06_get_raw_data()
 																		 (SPL06_data.i32RawPressure);                //存数据
 }
 
-int SPL06_check()
+int SPL06_check(int i2cmode)
 {
 	unsigned char ID = 0;
-	i2c_read(SPL06_ADDR, ID_REG, &ID, 1);
+	if(i2cmode == SPL06_HARDWARE) i2c_read(SPL06_ADDR, ID_REG, &ID, 1);
+	else                          i2c_read_soft(SPL06_ADDR, ID_REG, &ID, 1);
 	
 	if(ID == PRODUCT_ID)  return 1;
 	else                  return 0;
 }
 
-void SPL06_set_rate(unsigned char u8_Sensor, unsigned char u8_SmplRate, unsigned char u8_OverSmpl)
+void SPL06_set_rate(unsigned char u8_Sensor, unsigned char u8_SmplRate, unsigned char u8_OverSmpl,int i2cmode)
 {
 	unsigned char u8Reg = 0;
 	int i32KPkT = 0;
@@ -146,11 +159,22 @@ void SPL06_set_rate(unsigned char u8_Sensor, unsigned char u8_SmplRate, unsigned
 	 if(u8_Sensor == 0)
     {
         SPL06_data.i32KP = i32KPkT;
-        i2c_byte_write(SPL06_ADDR, PRS_CFG_REG, u8Reg);
+			
+        if(i2cmode == SPL06_HARDWARE) i2c_byte_write(SPL06_ADDR, PRS_CFG_REG, u8Reg);
+			  else                          i2c_byte_write_soft(SPL06_ADDR, PRS_CFG_REG, u8Reg);
+			
         if(u8_OverSmpl > 8)
         {
-            i2c_read(SPL06_ADDR, CFG_REG, &u8Reg, 1);
-            i2c_byte_write(SPL06_ADDR, CFG_REG, u8Reg | 0x04);
+					  if(i2cmode == SPL06_HARDWARE)
+						{
+								i2c_read(SPL06_ADDR, CFG_REG, &u8Reg, 1);
+								i2c_byte_write(SPL06_ADDR, CFG_REG, u8Reg | 0x04);
+						}
+						else
+						{
+							  i2c_read_soft(SPL06_ADDR, CFG_REG, &u8Reg, 1);
+								i2c_byte_write_soft(SPL06_ADDR, CFG_REG, u8Reg | 0x04);
+						}
         }
     }
     
@@ -159,18 +183,27 @@ void SPL06_set_rate(unsigned char u8_Sensor, unsigned char u8_SmplRate, unsigned
         SPL06_data.i32KT = i32KPkT;
         
         //Using mems temperature
-        i2c_byte_write(SPL06_ADDR, TMP_CFG_REG, u8Reg|0x80);  
+        if(i2cmode == SPL06_HARDWARE) i2c_byte_write(SPL06_ADDR, TMP_CFG_REG, u8Reg|0x80);
+        else                          i2c_byte_write_soft(SPL06_ADDR, TMP_CFG_REG, u8Reg|0x80);
         
         if(u8_OverSmpl > 8)
         {
-            i2c_read(SPL06_ADDR, CFG_REG, &u8Reg, 1);
-            i2c_byte_write(SPL06_ADDR, CFG_REG, u8Reg | 0x08);
+					  if(i2cmode == SPL06_HARDWARE)
+						{
+								i2c_read(SPL06_ADDR, CFG_REG, &u8Reg, 1);
+								i2c_byte_write(SPL06_ADDR, CFG_REG, u8Reg | 0x08);
+						}
+						else
+						{
+							  i2c_read_soft(SPL06_ADDR, CFG_REG, &u8Reg, 1);
+								i2c_byte_write_soft(SPL06_ADDR, CFG_REG, u8Reg | 0x08);
+						}
         }
     }
 }
 
 
-void SPL06_get_calib_param(int mode)
+void SPL06_get_calib_param(int mode, int i2cmode)
 {
     unsigned long h;
     unsigned long m;
@@ -191,76 +224,161 @@ void SPL06_get_calib_param(int mode)
 				SPL06_calparam.c30 = -1603;
 		}
     if(mode == 1)
-		{			
-				i2c_read(SPL06_ADDR, 0x10, &temp_h, 1);
-				i2c_read(SPL06_ADDR, 0x11, &temp_l, 1);
+		{
+        if(i2cmode == SPL06_HARDWARE)
+				{					
+					i2c_read(SPL06_ADDR, 0x10, &temp_h, 1);
+					i2c_read(SPL06_ADDR, 0x11, &temp_l, 1);
+				}
+				else
+				{
+					i2c_read_soft(SPL06_ADDR, 0x10, &temp_h, 1);
+					i2c_read_soft(SPL06_ADDR, 0x11, &temp_l, 1);
+				}
 			  h = temp_h;
 			  l = temp_l;
 				SPL06_calparam.c0 = (short)h<<4 | l>>4;
 				SPL06_calparam.c0 = (SPL06_calparam.c0&0x0800)?(0xF000|SPL06_calparam.c0):SPL06_calparam.c0;
 				
-				i2c_read(SPL06_ADDR, 0x11,&temp_h, 1);
-				i2c_read(SPL06_ADDR, 0x12, &temp_l, 1);
+				
+				if(i2cmode == SPL06_HARDWARE)
+				{
+					i2c_read(SPL06_ADDR, 0x11,&temp_h, 1);
+					i2c_read(SPL06_ADDR, 0x12, &temp_l, 1);
+				}
+				else
+				{
+					i2c_read_soft(SPL06_ADDR, 0x11,&temp_h, 1);
+					i2c_read_soft(SPL06_ADDR, 0x12, &temp_l, 1);
+				}
 			  h = temp_h;
 			  l = temp_l;
 				SPL06_calparam.c1 = (short)(h&0x0F)<<8 | l;
 				SPL06_calparam.c1 = (SPL06_calparam.c1&0x0800)?(0xF000|SPL06_calparam.c1):SPL06_calparam.c1;
 				
-				i2c_read(SPL06_ADDR, 0x13, &temp_h, 1);
-				i2c_read(SPL06_ADDR, 0x14, &temp_m, 1);
-				i2c_read(SPL06_ADDR, 0x15, &temp_l, 1);
+				
+				if(i2cmode == SPL06_HARDWARE)
+				{
+					i2c_read(SPL06_ADDR, 0x13, &temp_h, 1);
+					i2c_read(SPL06_ADDR, 0x14, &temp_m, 1);
+					i2c_read(SPL06_ADDR, 0x15, &temp_l, 1);
+				}
+				else
+				{
+					i2c_read_soft(SPL06_ADDR, 0x13, &temp_h, 1);
+					i2c_read_soft(SPL06_ADDR, 0x14, &temp_m, 1);
+					i2c_read_soft(SPL06_ADDR, 0x15, &temp_l, 1);
+				}
 			  h = temp_h;
 			  m = temp_m;
 			  l = temp_l;
 				SPL06_calparam.c00 = (int)h<<12 | (int)m<<4 | (int)l>>4;
 				SPL06_calparam.c00 = (SPL06_calparam.c00&0x080000)?(0xFFF00000|SPL06_calparam.c00):SPL06_calparam.c00;
-			
-				i2c_read(SPL06_ADDR, 0x15, &temp_h, 1);
-				i2c_read(SPL06_ADDR, 0x16, &temp_m, 1);
-				i2c_read(SPL06_ADDR, 0x17, &temp_l, 1);
+			  
+				
+				if(i2cmode == SPL06_HARDWARE)
+				{
+					i2c_read(SPL06_ADDR, 0x15, &temp_h, 1);
+					i2c_read(SPL06_ADDR, 0x16, &temp_m, 1);
+					i2c_read(SPL06_ADDR, 0x17, &temp_l, 1);
+				}
+				else
+				{
+					i2c_read_soft(SPL06_ADDR, 0x15, &temp_h, 1);
+					i2c_read_soft(SPL06_ADDR, 0x16, &temp_m, 1);
+					i2c_read_soft(SPL06_ADDR, 0x17, &temp_l, 1);
+				}
 				h = temp_h;
 			  m = temp_m;
 			  l = temp_l;
 				SPL06_calparam.c10 = (int)h<<16 | (int)m<<8 | l;
 				SPL06_calparam.c10 = (SPL06_calparam.c10&0x080000)?(0xFFF00000|SPL06_calparam.c10):SPL06_calparam.c10;
 				
-				i2c_read(SPL06_ADDR, 0x18, &temp_h, 1);
-				i2c_read(SPL06_ADDR, 0x19, &temp_l, 1);
+				
+				if(i2cmode == SPL06_HARDWARE)
+				{
+					i2c_read(SPL06_ADDR, 0x18, &temp_h, 1);
+					i2c_read(SPL06_ADDR, 0x19, &temp_l, 1);
+				}
+				else
+				{
+					i2c_read_soft(SPL06_ADDR, 0x18, &temp_h, 1);
+					i2c_read_soft(SPL06_ADDR, 0x19, &temp_l, 1);
+				}
 				h = temp_h;
 			  l = temp_l;
 				SPL06_calparam.c01 = (short)h<<8 | l;
 				
-				i2c_read(SPL06_ADDR, 0x1A, &temp_h, 1);
-				i2c_read(SPL06_ADDR, 0x1B, &temp_l, 1);
+				
+				if(i2cmode == SPL06_HARDWARE)
+				{
+					i2c_read(SPL06_ADDR, 0x1A, &temp_h, 1);
+					i2c_read(SPL06_ADDR, 0x1B, &temp_l, 1);
+				}
+				else
+				{
+					i2c_read_soft(SPL06_ADDR, 0x1A, &temp_h, 1);
+					i2c_read_soft(SPL06_ADDR, 0x1B, &temp_l, 1);
+				}
 				h = temp_h;
 			  l = temp_l;
 				SPL06_calparam.c11 = (short)h<<8 | l;
 				
-				i2c_read(SPL06_ADDR, 0x1C, &temp_h, 1);
-				i2c_read(SPL06_ADDR, 0x1D, &temp_l, 1);
+				
+				if(i2cmode == SPL06_HARDWARE)
+				{
+					i2c_read(SPL06_ADDR, 0x1C, &temp_h, 1);
+					i2c_read(SPL06_ADDR, 0x1D, &temp_l, 1);
+				}
+				else
+				{
+					i2c_read_soft(SPL06_ADDR, 0x1C, &temp_h, 1);
+					i2c_read_soft(SPL06_ADDR, 0x1D, &temp_l, 1);
+				}
 				h = temp_h;
 			  l = temp_l;
 				SPL06_calparam.c20 = (short)h<<8 | l;
 				
-				i2c_read(SPL06_ADDR, 0x1E, &temp_h, 1);
-				i2c_read(SPL06_ADDR, 0x1F, &temp_l, 1);
+				
+				if(i2cmode == SPL06_HARDWARE)
+				{
+					i2c_read(SPL06_ADDR, 0x1E, &temp_h, 1);
+					i2c_read(SPL06_ADDR, 0x1F, &temp_l, 1);
+				}
+				else
+				{
+					i2c_read_soft(SPL06_ADDR, 0x1E, &temp_h, 1);
+					i2c_read_soft(SPL06_ADDR, 0x1F, &temp_l, 1);
+				}
 				h = temp_h;
 			  l = temp_l;
 				SPL06_calparam.c21 = (short)h<<8 | l;
 				
-				i2c_read(SPL06_ADDR, 0x20, &temp_h, 1);
-				i2c_read(SPL06_ADDR, 0x21, &temp_l, 1);
+				
+				if(i2cmode == SPL06_HARDWARE)
+				{
+					i2c_read(SPL06_ADDR, 0x20, &temp_h, 1);
+					i2c_read(SPL06_ADDR, 0x21, &temp_l, 1);
+				}
+				else
+				{
+					i2c_read_soft(SPL06_ADDR, 0x20, &temp_h, 1);
+					i2c_read_soft(SPL06_ADDR, 0x21, &temp_l, 1);
+				}
 				h = temp_h;
 			  l = temp_l;
 				SPL06_calparam.c30 = (short)h<<8 | l;
 	  }
 }
 
-void SPL06_height_process()
+void SPL06_height_process(int i2cmode)
 {
 	HEIGHT_process_complete = 0;
 	
-	SPL06_info_update();
+	SPL06_info_update(i2cmode);
+	
+	//kalman_filter(&kalman_height, SPL06_data.fRelative_Alt);
+	
 	attitude.height = SPL06_data.fRelative_Alt * 100;   //数据转存入姿态结构体，单位cm
 	
 	HEIGHT_process_complete = 1;
@@ -291,7 +409,7 @@ float SPL06_get_pressure()
 }
 
 
-void SPL06_info_update()
+void SPL06_info_update(int i2cmode)
 {
 	/* tropospheric properties (0-11km) for standard atmosphere */
 	/* temperature at base height in Kelvin, [K] = [癈] + 273.15 */
@@ -313,7 +431,7 @@ void SPL06_info_update()
 	double p = SPL06_data.fPressure / 1000.0;
 
 	
-	SPL06_get_raw_data();    //获取原始数据
+	SPL06_get_raw_data(i2cmode);    //获取原始数据
 	
 	SPL06_data.fPressure = SPL06_get_pressure();
 	

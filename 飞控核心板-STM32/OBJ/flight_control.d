@@ -33,5 +33,10 @@
 ..\obj\flight_control.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 ..\obj\flight_control.o: ..\HARDWEAR\inc\mpu6050.h
 ..\obj\flight_control.o: ..\HARDWEAR\inc\i2c.h
-..\obj\flight_control.o: ..\MATH\inc\myMath.h
+..\obj\flight_control.o: ..\HARDWEAR\inc\mpu6050.h
+..\obj\flight_control.o: ..\HARDWEAR\inc\spl06.h
+..\obj\flight_control.o: ..\HARDWEAR\inc\i2c.h
 ..\obj\flight_control.o: ..\MATH\inc\flight_control.h
+..\obj\flight_control.o: ..\SYSTEM\delay\delay.h
+..\obj\flight_control.o: ..\SYSTEM\sys\sys.h
+..\obj\flight_control.o: ..\MATH\inc\myMath.h

@@ -31,7 +31,11 @@
 ..\obj\mpu6050.o: ..\STM32F10X_FWLib\inc\misc.h
 ..\obj\mpu6050.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 ..\obj\mpu6050.o: ..\HARDWEAR\inc\i2c.h
-..\obj\mpu6050.o: ..\MATH\inc\myMath.h
+..\obj\mpu6050.o: ..\HARDWEAR\inc\mpu6050.h
+..\obj\mpu6050.o: ..\HARDWEAR\inc\spl06.h
+..\obj\mpu6050.o: ..\HARDWEAR\inc\i2c.h
 ..\obj\mpu6050.o: ..\MATH\inc\flight_control.h
 ..\obj\mpu6050.o: ..\MATH\inc\kalman.h
-..\obj\mpu6050.o: ..\HARDWEAR\inc\mpu6050.h
+..\obj\mpu6050.o: ..\MATH\inc\myMath.h
+..\obj\mpu6050.o: ..\SYSTEM\delay\delay.h
+..\obj\mpu6050.o: ..\SYSTEM\sys\sys.h

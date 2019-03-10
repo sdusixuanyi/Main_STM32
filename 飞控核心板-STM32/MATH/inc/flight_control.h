@@ -128,17 +128,17 @@ struct Set_value        //pid中的各种目标值    程序中也用于存储误差和误差累积
 };
 
 
-void flight_control(void);
+void flight_control(int COMorDMAmode, int COMmode);
 
-void MPU6050_get_offset(void);
+void MPU6050_get_offset(int mode);
 
-void Attitude_process(int mode);       //解算当前姿态
+void Attitude_process(int COMorDMAmode, int COMmode);       //解算当前姿态
 
 void Get_angle(struct Attitude_float *addr, float dt);
 
 void duty_runout_adjustment(void);       //占空比溢出调整
 
-void flight_control_debug(int mode, float set_value);     //飞控PID参数单轴调试程序   mode为调试对象   set_value为目标值
+void flight_control_debug(int DebugMode, float set_value, int COMorDMAmode, int COMmode);     //飞控PID参数单轴调试程序   mode为调试对象   set_value为目标值
 
 float limit(float target_value, float max, float min);    //通用限幅程序
 

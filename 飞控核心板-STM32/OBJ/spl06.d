@@ -31,10 +31,12 @@
 ..\obj\spl06.o: ..\STM32F10X_FWLib\inc\stm32f10x_wwdg.h
 ..\obj\spl06.o: ..\STM32F10X_FWLib\inc\misc.h
 ..\obj\spl06.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+..\obj\spl06.o: ..\HARDWEAR\inc\mpu6050.h
+..\obj\spl06.o: ..\HARDWEAR\inc\i2c.h
+..\obj\spl06.o: ..\MATH\inc\myMath.h
 ..\obj\spl06.o: ..\MATH\inc\flight_control.h
 ..\obj\spl06.o: ..\MATH\inc\kalman.h
 ..\obj\spl06.o: ..\HARDWEAR\inc\mpu6050.h
-..\obj\spl06.o: ..\MATH\inc\myMath.h
-..\obj\spl06.o: ..\MATH\inc\flight_control.h
+..\obj\spl06.o: ..\HARDWEAR\inc\spl06.h
 ..\obj\spl06.o: ..\SYSTEM\delay\delay.h
 ..\obj\spl06.o: ..\SYSTEM\sys\sys.h

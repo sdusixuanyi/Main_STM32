@@ -6,7 +6,7 @@
 #include "flight_control.h"
 #include "delay.h"
 
-#define SPL06_ADDR 0x76 << 1   //气压计从机地址
+#define SPL06_ADDR 0x76 << 1   //气压计从机地址，使用时需要左移一位然后将最后一位置1或0
 //#define ID_REG 0x0D        //气压计ID寄存器地址
 #define PRODUCT_ID 0X10    //产品ID
 
@@ -39,6 +39,9 @@
 #define PRESSURE_SENSOR 0
 #define TEMPERATURE_SENSOR 1
 
+#define SPL06_HARDWARE 0
+#define SPL06_SOFTWARE 1
+
 struct calib_param
 {
 	short c0;
@@ -70,20 +73,20 @@ struct SPL06_DATA
 	float fOffset;
 };
 
-int SPL06_check(void);
+int SPL06_check(int i2cmode);
 
-void SPL06_init(void);
+void SPL06_init(int i2cmode);
 
-void SPL06_get_raw_data(void);
+void SPL06_get_raw_data(int i2cmode);
 
-void SPL06_set_rate(unsigned char u8_Sensor, unsigned char u8_SmplRate, unsigned char u8_OverSmpl);
+void SPL06_set_rate(unsigned char u8_Sensor, unsigned char u8_SmplRate, unsigned char u8_OverSmpl, int i2cmode);
 
-void SPL06_get_calib_param(int mode);    //获取校准值，0为人工配置，1为自动读取
+void SPL06_get_calib_param(int mode, int i2cmode);    //获取校准值，0为人工配置，1为自动读取
 
-void SPL06_height_process(void);      //获取高度并存入attitude.height中
+void SPL06_height_process(int i2cmode);      //获取高度并存入attitude.height中
 
 float SPL06_get_pressure(void);
 
-void SPL06_info_update(void);
+void SPL06_info_update(int i2cmode);
 
 #endif

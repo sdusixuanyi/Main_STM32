@@ -43,7 +43,7 @@ int store_pos = 0;      //该轮误差存储位置
 float motor_duty[4] = {STA_DUTY, STA_DUTY, STA_DUTY, STA_DUTY};   //X型 暂定编号：飞机平放头朝自己，俯视下逆时针给电机编号0123，01为头，23为尾
 float motor_delta_duty[4] = {0,0,0,0};
 
-void flight_control()
+void flight_control(int COMorDMAmode, int COMmode)
 {
 	int i;
 	int read_position;               //计算隔N个数据计算时上一个读取数据的位置
@@ -52,7 +52,7 @@ void flight_control()
 	float temp_delta_duty;           //中间变量，临时存放占空比增量
 	double gra_ang_z;  //z轴和重力方向的夹角
 	
-	Attitude_process(DMA_READ);     //解算姿态
+	Attitude_process(COMorDMAmode, COMmode);     //解算姿态
 	
 	for(i = 0 ; i < 4 ; i++)   motor_delta_duty[i] = 0;    //清空占空比增量
 	
@@ -179,12 +179,12 @@ void flight_control()
 	if(store_pos == ERR_STORE_NUM)   store_pos = 0;
 }
 
-void MPU6050_get_offset()
+void MPU6050_get_offset(int mode)
 {
 	int i;
 	for(i = 0 ; i < 100 ; i ++)
 	{
-		MPU6050_get_data(raw_data);
+		MPU6050_get_data(raw_data, mode);
 		
 		MPU6050_data_translation(raw_data, translated_data);
 		
@@ -199,7 +199,7 @@ void MPU6050_get_offset()
 	
 	for(i = 0 ; i < 100 ; i ++)
 	{
-		MPU6050_get_data(raw_data);
+		MPU6050_get_data(raw_data, mode);
 		
 		MPU6050_data_translation(raw_data, translated_data);
 		
@@ -229,13 +229,13 @@ void MPU6050_get_offset()
 	offset.roll  = offset.roll / 100;
 }
 
-void Attitude_process(int mode)
+void Attitude_process(int COMorDMAmode, int COMmode)
 {
-	if (mode == COMMON_READ) MPU6050_get_data(raw_data);      //常规读取
+	if (COMorDMAmode == COMMON_READ) MPU6050_get_data(raw_data, COMmode);      //常规读取
 	
 	MPU6050_data_translation(raw_data, translated_data);
 	
-	if (mode == DMA_READ)    MPU6050_dma_read(MPU6050_ADDRESS, 0x3B);   //DMA方式读取
+	if (COMorDMAmode == DMA_READ)    MPU6050_dma_read(MPU6050_ADDRESS, 0x3B);   //DMA方式读取
 	
 	translated_data[4] -= offset.gyro_x;         //角速度减去静态偏差
 	translated_data[5] -= offset.gyro_y;
@@ -382,7 +382,7 @@ void duty_runout_adjustment()
 }
 
 
-void flight_control_debug(int mode, float set_value)
+void flight_control_debug(int DebugMode, float set_value, int COMorDMAmode, int COMmode)
 {
 	//int height_flag = 0;
 	int gyro_x_flag = 0,
@@ -399,7 +399,7 @@ void flight_control_debug(int mode, float set_value)
 	float temp_delta_duty;           //中间变量，临时存放占空比增量
 	double gra_ang_z;  //z轴和重力方向的夹角
 	
-	Attitude_process(DMA_READ);
+	Attitude_process(COMorDMAmode, COMmode);
 	
 	for(i = 0 ; i < 4 ; i++)   motor_delta_duty[i] = 0;    //清空占空比增量
 	
@@ -411,7 +411,7 @@ void flight_control_debug(int mode, float set_value)
 	if(store_pos - (period - 1) >= 0)   read_position = store_pos - (period - 1);   //计算读取位置（微分运算要用）
 	else read_position = ERR_STORE_NUM - ((period - 1) - store_pos) + 1;
 	
-	switch (mode)
+	switch (DebugMode)
 	{
 		case DEBUG_MODE_GYRO_X : gyro_x_flag = 1; Set.gyro_x = set_value; break;
 		case DEBUG_MODE_GYRO_Y : gyro_y_flag = 1; Set.gyro_y = set_value; break;

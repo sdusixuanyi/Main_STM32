@@ -36,15 +36,19 @@
 #define ACCEL_RANGE  4       //单位g
 #define GYRO_RANGE   2000    //单位°/s
 
+//软硬件IIC模式选择
+#define MPU6050_HARDWARE 0
+#define MPU6050_SOFTWARE 1
 
-void MPU6050_init(void);
 
-void MPU6050_get_data(unsigned char* addr);
+void MPU6050_init(int mode);
+
+void MPU6050_get_data(unsigned char* addr, int mode);
 
 void MPU6050_data_translation(unsigned char* raw_addr, short int* translation_addr);
 
 void MPU6050_dma_read(unsigned char slave_addr, unsigned char reg_addr);
 
-int MPU6050_check(void);         //MPU6050自检程序，返回1表示数据读取正常，返回0表示异常，需要I2C初始化后再使用
+int MPU6050_check(int mode);         //MPU6050自检程序，返回1表示数据读取正常，返回0表示异常，需要I2C初始化后再使用
 
 #endif

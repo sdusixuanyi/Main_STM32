@@ -8,22 +8,34 @@ extern float accel[3];
 extern float gyro[3];
 float data[7] = {0};
 
-void MPU6050_init(void)
+void MPU6050_init(int mode)
 {
-	i2c_byte_write(MPU6050_ADDRESS, MPU6050_RA_PWR_MGMT_1, 0x00);         //reg107,唤醒，8M内部时钟源
-	i2c_byte_write(MPU6050_ADDRESS, MPU6050_RA_SMPLRT_DIV, 0x07);         //采用频率  1000
-	i2c_byte_write(MPU6050_ADDRESS, MPU6050_RA_CONFIG, 0x06);
-	i2c_byte_write(MPU6050_ADDRESS, MPU6050_RA_ACCEL_CONFIG, 0x09);       //加速度量程4g
-	i2c_byte_write(MPU6050_ADDRESS, MPU6050_RA_GYRO_CONFIG, 0x18);        //角速度量程2000°/s
+	if(mode == MPU6050_HARDWARE)
+	{
+		i2c_byte_write(MPU6050_ADDRESS, MPU6050_RA_PWR_MGMT_1, 0x00);         //reg107,唤醒，8M内部时钟源
+		i2c_byte_write(MPU6050_ADDRESS, MPU6050_RA_SMPLRT_DIV, 0x07);         //采用频率  1000
+		i2c_byte_write(MPU6050_ADDRESS, MPU6050_RA_CONFIG, 0x06);
+		i2c_byte_write(MPU6050_ADDRESS, MPU6050_RA_ACCEL_CONFIG, 0x09);       //加速度量程4g
+		i2c_byte_write(MPU6050_ADDRESS, MPU6050_RA_GYRO_CONFIG, 0x18);        //角速度量程2000°/s
+	}
+	else
+	{
+		i2c_byte_write_soft(MPU6050_ADDRESS, MPU6050_RA_PWR_MGMT_1, 0x00);         //reg107,唤醒，8M内部时钟源
+		i2c_byte_write_soft(MPU6050_ADDRESS, MPU6050_RA_SMPLRT_DIV, 0x07);         //采用频率  1000
+		i2c_byte_write_soft(MPU6050_ADDRESS, MPU6050_RA_CONFIG, 0x06);
+		i2c_byte_write_soft(MPU6050_ADDRESS, MPU6050_RA_ACCEL_CONFIG, 0x09);       //加速度量程4g
+		i2c_byte_write_soft(MPU6050_ADDRESS, MPU6050_RA_GYRO_CONFIG, 0x18);        //角速度量程2000°/s
+	}
 	
-	while(!MPU6050_check());
-	MPU6050_get_offset();
+	while(!MPU6050_check(mode));
+	MPU6050_get_offset(mode);
 }
 
-void MPU6050_get_data(unsigned char* addr)
+void MPU6050_get_data(unsigned char* addr, int mode)
 {
 	
-	i2c_read(MPU6050_ADDRESS, 0x3B, addr, 14);
+	if(mode == MPU6050_HARDWARE) i2c_read(MPU6050_ADDRESS, 0x3B, addr, 14);
+	else                         i2c_read_soft(MPU6050_ADDRESS, 0x3B, addr, 14);
 	//USART_SendData(USART1, *addr);
 	//USART_SendData(USART1, '\n');
 }
@@ -107,14 +119,14 @@ void MPU6050_dma_read(unsigned char slave_addr, unsigned char reg_addr)
   //now go back to the main routine
 }
 
-int MPU6050_check()
+int MPU6050_check(int mode)
 {
 	long long int count = 0;
 	int i, j;
 	
 	for(i = 0 ; i < 100 ; i ++)
 	{	
-		MPU6050_get_data(raw_data);      //常规读取
+		MPU6050_get_data(raw_data, mode);      //常规读取
 		
 		MPU6050_data_translation(raw_data, translated_data);
 		

@@ -42,11 +42,12 @@
 ..\obj\main.o: ..\HARDWEAR\inc\i2c.h
 ..\obj\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 ..\obj\main.o: ..\HARDWEAR\inc\mpu6050.h
+..\obj\main.o: ..\HARDWEAR\inc\i2c.h
 ..\obj\main.o: ..\MATH\inc\myMath.h
 ..\obj\main.o: ..\MATH\inc\flight_control.h
 ..\obj\main.o: ..\MATH\inc\kalman.h
 ..\obj\main.o: ..\HARDWEAR\inc\mpu6050.h
+..\obj\main.o: ..\HARDWEAR\inc\spl06.h
 ..\obj\main.o: ..\HARDWEAR\inc\rtc.h
 ..\obj\main.o: ..\HARDWEAR\inc\stmflash.h
 ..\obj\main.o: ..\HARDWEAR\inc\iwdg.h
-..\obj\main.o: ..\HARDWEAR\inc\spl06.h

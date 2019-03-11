@@ -285,8 +285,8 @@ void Get_angle(struct Attitude_float *addr, float dt)
  	NormQuat = Q_rsqrt( squa(addr->accel_x)+ squa(addr->accel_y) +squa(addr->accel_z) );
 // 	//
 	Acc.x = addr->accel_x * NormQuat; //
-	Acc.y = addr->accel_x * NormQuat;  
-	Acc.z = addr->accel_x * NormQuat;  
+	Acc.y = addr->accel_y * NormQuat;  
+	Acc.z = addr->accel_z * NormQuat;  
 
 // 	//
 	AccGravity.x = (Acc.y * Gravity.z - Acc.z * Gravity.y);
@@ -298,8 +298,8 @@ void Get_angle(struct Attitude_float *addr, float dt)
 	GyroIntegError.z += AccGravity.z * KiDef;
 // 	//
 	Gyro.x = (addr->gyro_x) * Gyro_Gr + KpDef * AccGravity.x  +  GyroIntegError.x;//???,,????????????
-	Gyro.y = addr->gyro_y * Gyro_Gr + KpDef * AccGravity.y  +  GyroIntegError.y;
-	Gyro.z = addr->gyro_z * Gyro_Gr + KpDef * AccGravity.z  +  GyroIntegError.z;    
+	Gyro.y = (addr->gyro_y) * Gyro_Gr + KpDef * AccGravity.y  +  GyroIntegError.y;
+	Gyro.z = (addr->gyro_z) * Gyro_Gr + KpDef * AccGravity.z  +  GyroIntegError.z;    
 // 	//
 // 	//
 	q0_t = (-NumQ.q1 * Gyro.x - NumQ.q2 * Gyro.y - NumQ.q3 * Gyro.z) * HalfTime;

@@ -13,12 +13,14 @@
 #include "stmflash.h"
 #include "iwdg.h"
 #include "spl06.h"
+#include "adc.h"
 
 
 unsigned char raw_data[14] = {0};
 short int translated_data[7];
 float accel[3];         
 float gyro[3];
+float Power_V;
 extern int dma_flag;    //dma传输完成后会置1
 //u8 TEXT_Buffer[10] = { "0123456789" };
 
@@ -29,6 +31,7 @@ void Init()
 	LED_Init();
 	KEY_Init();
 	delay_init();
+	Adc_Init();
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 	//HCSR04_Init();
 //	Beep_Init();
@@ -58,6 +61,7 @@ int main(void)
 //	TIM4_CH2_Duty(600);
 //	TIM4_CH3_Duty(600);
 //	TIM4_CH4_Duty(600);	
+		Power_V=Get_Adc(1);
     flight_control(COMMON_READ, MPU6050_SOFTWARE);
 		
     SPL06_height_process(SPL06_SOFTWARE);			

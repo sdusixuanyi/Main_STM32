@@ -4,7 +4,7 @@
 
 
 extern uint8_t HCSR04_Error,HCSR04_OK,HCSR04_RunFlag,HCSR04_Update;
-
+extern float HCSR04_Distance;
 void HCSR04_Init(void);
 void HCSR04_Run(void);
 float HCSR04_Get_Distance(int time);

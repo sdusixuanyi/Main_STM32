@@ -35,6 +35,7 @@
 "..\obj\rtc.o"
 "..\obj\stmflash.o"
 "..\obj\spl06.o"
+"..\obj\ano_dt.o"
 "..\obj\delay.o"
 "..\obj\usart.o"
 "..\obj\sys.o"

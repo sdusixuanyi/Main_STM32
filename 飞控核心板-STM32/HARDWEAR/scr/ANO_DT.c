@@ -1,9 +1,8 @@
-#include "data_transfer.h"
-#include "usart.h"
+#include "ANO_DT.h"
 #include "mpu6050.h"
-#include "flight.h"
-#include "nrf24l01.h"
-
+#include "flight_control.h"
+#include "24l01.h"
+#include "HCSR04.h"
 
 /////////////////////////////////////////////////////////////////////////////////////
 //数据拆分宏定义，在发送大于1字节的数据类型时，比如int16、float等，需要把数据拆分成单独字节进行发送
@@ -15,6 +14,21 @@
 dt_flag_t f;            //需要发送数据的标志
 u8 data_to_send[50];    //发送数据缓存
 extern float motor_duty[4];
+extern struct PID_parameter PID_pitch ;  //姿态角PID
+extern struct PID_parameter PID_roll;
+extern struct PID_parameter PID_yaw;
+
+extern struct PID_parameter PID_gyro_x;  //角速度PID
+extern struct PID_parameter PID_gyro_y;
+extern struct PID_parameter PID_gyro_z;
+
+extern struct PID_parameter PID_height;  //高度PID
+
+extern struct Attitude_int offset;     //四旋翼静态的时候6050测得的数据
+extern struct Attitude_float attitude;   //四旋翼当前的姿态数据
+
+extern float Power_V;
+
 /////////////////////////////////////////////////////////////////////////////////////
 //Data_Exchange函数处理各种数据发送请求，比如想实现每5ms发送一次传感器数据至上位机，即在此函数内实现
 //此函数应由用户每1ms调用一次
@@ -23,7 +37,6 @@ void ANO_DT_Data_Exchange(void)
     static u8 cnt = 0;
     static u8 senser_cnt    = 10;
     static u8 status_cnt    = 15;
-    static u8 rcdata_cnt    = 20;
     static u8 motopwm_cnt   = 20;
     static u8 power_cnt     = 50;			//计量值用来确定数据传输频率
     
@@ -32,9 +45,6 @@ void ANO_DT_Data_Exchange(void)
 
     if((cnt % status_cnt) == (status_cnt-1))
         f.send_status = 1;  
-    //
-    //if((cnt % rcdata_cnt) == (rcdata_cnt-1))
-    //    f.send_rcdata = 1;  
     
     if((cnt % motopwm_cnt) == (motopwm_cnt-1))
         f.send_motopwm = 1; 
@@ -43,17 +53,12 @@ void ANO_DT_Data_Exchange(void)
         f.send_power = 1;					//到达计数值，标志位置一
     
     cnt++;
+
 /////////////////////////////////////////////////////////////////////////////////////
-    //if(f.send_version)//传输版本号
-    //{
-    //    f.send_version = 0;
-    //    ANO_DT_Send_Version(4,300,100,400,0);		//检测到标志位为1就清零并进行对应数据传输
-    //}
-/////////////////////////////////////////////////////////////////////////////////////
-    else if(f.send_status)//传输UAV当前状态、姿态角、高度
+    if(f.send_status)//传输UAV当前状态、姿态角、高度
     {
         f.send_status = 0;
-        ANO_DT_Send_Status(attitude.Roll, attitude.Pitch, attitude.Yaw, HCSR04_Distance,0,fly_ready);
+        ANO_DT_Send_Status(attitude.roll, attitude.pitch, attitude.yaw, HCSR04_Distance,0,0);
     }   
 /////////////////////////////////////////////////////////////////////////////////////
     else if(f.send_senser)//传输传感器数据6050和磁力计
@@ -61,12 +66,7 @@ void ANO_DT_Data_Exchange(void)
         f.send_senser = 0;
         ANO_DT_Send_Senser(offset.accel_x, offset.accel_y, offset.accel_z,offset.gyro_x,offset.gyro_y,offset.gyro_z,0,0,0,0);
     }   
-/////////////////////////////////////////////////////////////////////////////////////
-    //else if(f.send_rcdata)//传输PWM数据信号
-    //{
-    //    f.send_rcdata = 0;
-    //    ANO_DT_Send_RCData(Rc_Pwm_In[0],Rc_Pwm_In[1],Rc_Pwm_In[2],Rc_Pwm_In[3],Rc_Pwm_In[4],Rc_Pwm_In[5],Rc_Pwm_In[6],Rc_Pwm_In[7],0,0);
-    //}   
+  
 /////////////////////////////////////////////////////////////////////////////////////   
     else if(f.send_motopwm)//传输电机PWM信号
     {
@@ -83,21 +83,20 @@ void ANO_DT_Data_Exchange(void)
     else if(f.send_pid1)//传输PID参数
     {
         f.send_pid1 = 0;
-        ANO_DT_Send_PID(1, PID_pitch.Kp, PID_pitch.Ki, PID_pitch.Kd, PID_roll.Kp, PID_roll,Ki, PID_roll.Kd, PID_yaw.Kp, PID_yaw.Ki, PID_yaw.Kd);
+        ANO_DT_Send_PID(1, PID_pitch.Kp, PID_pitch.Ki, PID_pitch.Kd, PID_roll.Kp, PID_roll.Ki, PID_roll.Kd, PID_yaw.Kp, PID_yaw.Ki, PID_yaw.Kd);
     }   
 /////////////////////////////////////////////////////////////////////////////////////
     else if(f.send_pid2)
     {
         f.send_pid2 = 0;
-		ANO_DT_Send_PID(2, PID_gyro_x.Kp, PID_gyro_x.Ki, PID_gyro_x.Kd, PID_gyro_y.Kp, PID_gyro_y, Ki, PID_gyro_y.Kd, PID_gyro_z.Kp, PID_gyro_z.Ki, PID_gyro_z.Kd);
+		ANO_DT_Send_PID(2, PID_gyro_x.Kp, PID_gyro_x.Ki, PID_gyro_x.Kd, PID_gyro_y.Kp, PID_gyro_y.Ki, PID_gyro_y.Kd, PID_gyro_z.Kp, PID_gyro_z.Ki, PID_gyro_z.Kd);
 	}
 /////////////////////////////////////////////////////////////////////////////////////
     else if(f.send_pid3)
     {
         f.send_pid3 = 0;
-		ANO_DT_Send_PID(3, PID_height.Kp, PID_height.Ki, PID_height.Kd);
-	}
-/*    Usb_Hid_Send();   */              
+		ANO_DT_Send_PID(3, PID_height.Kp, PID_height.Ki, PID_height.Kd, PID_height.Kp, PID_height.Ki, PID_height.Kd, PID_height.Kp, PID_height.Ki, PID_height.Kd);
+	}           
 /////////////////////////////////////////////////////////////////////////////////////
 }
 
@@ -106,24 +105,21 @@ void ANO_DT_Data_Exchange(void)
 //移植时，用户应根据自身应用的情况，根据使用的通信方式，实现此函数
 void ANO_DT_Send_Data(u8 *dataToSend , u8 length)
 {
-	NRF24L01_Write_Buf(TX_ADDR,dataToSend,length);
+	NRF24L01_TxPacket(dataToSend);
 }
 
 static void ANO_DT_Send_Check(u8 head, u8 check_sum)//传输校验值
 {
+	    u8 sum = 0,i;
     data_to_send[0]=0xAA;
     data_to_send[1]=0xAA;
     data_to_send[2]=0xEF;
     data_to_send[3]=2;
     data_to_send[4]=head;
     data_to_send[5]=check_sum;
-
-
-    u8 sum = 0;
-    for(u8 i=0;i<6;i++)
+    for(i=0;i<6;i++)
         sum += data_to_send[i];
     data_to_send[6]=sum;
-
     ANO_DT_Send_Data(data_to_send, 7);
 }
 
@@ -131,6 +127,8 @@ static void ANO_DT_Send_Check(u8 head, u8 check_sum)//传输校验值
 //Data_Receive_Prepare函数是协议预解析，根据协议的格式，将收到的数据进行一次格式性解析，格式正确的话再进行数据解析
 //移植时，此函数应由用户根据自身使用的通信方式自行调用，比如串口每收到一字节数据，则调用此函数一次
 //此函数解析出符合格式的数据帧后，会自行调用数据解析函数
+
+//接收函数，对接收到的数据进行数据解析，确认是否符合规定的数据传输格式
 void ANO_DT_Data_Receive_Prepare(u8 data)
 {
     static u8 RxBuffer[50];
@@ -181,23 +179,23 @@ void ANO_DT_Data_Receive_Prepare(u8 data)
 //此函数可以不用用户自行调用，由函数Data_Receive_Prepare自动调用
 void ANO_DT_Data_Receive_Anl(u8 *data_buf,u8 num)
 {
-    u8 sum = 0;
-    for(u8 i=0;i<(num-1);i++)
+    u8 sum = 0,i;
+    for(i=0;i<(num-1);i++)
         sum += *(data_buf+i);
-    if(!(sum==*(data_buf+num-1)))       return;     //判断sum
-    if(!(*(data_buf)==0xAA && *(data_buf+1)==0xAF))     return;     //判断帧头
+    if(!(sum==*(data_buf+num-1)))       return ;     //判断sum
+    if(!(*(data_buf)==0xAA && *(data_buf+1)==0xAF))     return  ;     //判断帧头
     
     if(*(data_buf+2)==0X01)
     {
-        if(*(data_buf+4)==0X01)
-            mpu6050.Acc_CALIBRATE = 1;
-        if(*(data_buf+4)==0X02)
-            mpu6050.Gyro_CALIBRATE = 1;
-        if(*(data_buf+4)==0X03)
-        {
-            mpu6050.Acc_CALIBRATE = 1;      
-            mpu6050.Gyro_CALIBRATE = 1;         
-        }
+//        if(*(data_buf+4)==0X01)
+//            mpu6050.Acc_CALIBRATE = 1;
+//        if(*(data_buf+4)==0X02)
+//            mpu6050.Gyro_CALIBRATE = 1;
+//        if(*(data_buf+4)==0X03)
+//        {
+//            mpu6050.Acc_CALIBRATE = 1;      
+//            mpu6050.Gyro_CALIBRATE = 1;         
+//        }
     }
     
     if(*(data_buf+2)==0X02)
@@ -215,58 +213,58 @@ void ANO_DT_Data_Receive_Anl(u8 *data_buf,u8 num)
         {
             
         }
-        if(*(data_buf+4)==0XA0)     //读取版本信息
-        {
-            f.send_version = 1;
-        }
-        if(*(data_buf+4)==0XA1)     //恢复默认参数
-        {
-            Para_ResetToFactorySetup();
-        }
+//        if(*(data_buf+4)==0XA0)     //读取版本信息
+//        {
+//            f.send_version = 1;
+//        }
+//        if(*(data_buf+4)==0XA1)     //恢复默认参数
+//        {
+//            Para_ResetToFactorySetup();
+//        }
     }
 
-    if(*(data_buf+2)==0X10)                             //PID1
-    {
-        ctrl_1.PID[PIDROLL].kp  = 0.001*( (vs16)(*(data_buf+4)<<8)|*(data_buf+5) );
-        ctrl_1.PID[PIDROLL].ki  = 0.001*( (vs16)(*(data_buf+6)<<8)|*(data_buf+7) );
-        ctrl_1.PID[PIDROLL].kd  = 0.001*( (vs16)(*(data_buf+8)<<8)|*(data_buf+9) );
-        ctrl_1.PID[PIDPITCH].kp = 0.001*( (vs16)(*(data_buf+10)<<8)|*(data_buf+11) );
-        ctrl_1.PID[PIDPITCH].ki = 0.001*( (vs16)(*(data_buf+12)<<8)|*(data_buf+13) );
-        ctrl_1.PID[PIDPITCH].kd = 0.001*( (vs16)(*(data_buf+14)<<8)|*(data_buf+15) );
-        ctrl_1.PID[PIDYAW].kp   = 0.001*( (vs16)(*(data_buf+16)<<8)|*(data_buf+17) );
-        ctrl_1.PID[PIDYAW].ki   = 0.001*( (vs16)(*(data_buf+18)<<8)|*(data_buf+19) );
-        ctrl_1.PID[PIDYAW].kd   = 0.001*( (vs16)(*(data_buf+20)<<8)|*(data_buf+21) );
-        ANO_DT_Send_Check(*(data_buf+2),sum);
-                Param_SavePID();
-    }
-    if(*(data_buf+2)==0X11)                             //PID2
-    {
-        ctrl_1.PID[PID4].kp     = 0.001*( (vs16)(*(data_buf+4)<<8)|*(data_buf+5) );
-        ctrl_1.PID[PID4].ki     = 0.001*( (vs16)(*(data_buf+6)<<8)|*(data_buf+7) );
-        ctrl_1.PID[PID4].kd     = 0.001*( (vs16)(*(data_buf+8)<<8)|*(data_buf+9) );
-        ctrl_1.PID[PID5].kp     = 0.001*( (vs16)(*(data_buf+10)<<8)|*(data_buf+11) );
-        ctrl_1.PID[PID5].ki     = 0.001*( (vs16)(*(data_buf+12)<<8)|*(data_buf+13) );
-        ctrl_1.PID[PID5].kd     = 0.001*( (vs16)(*(data_buf+14)<<8)|*(data_buf+15) );
-        ctrl_1.PID[PID6].kp   = 0.001*( (vs16)(*(data_buf+16)<<8)|*(data_buf+17) );
-        ctrl_1.PID[PID6].ki     = 0.001*( (vs16)(*(data_buf+18)<<8)|*(data_buf+19) );
-        ctrl_1.PID[PID6].kd     = 0.001*( (vs16)(*(data_buf+20)<<8)|*(data_buf+21) );
-        ANO_DT_Send_Check(*(data_buf+2),sum);
-                Param_SavePID();
-    }
-    if(*(data_buf+2)==0X12)                             //PID3
-    {   
-        ctrl_2.PID[PIDROLL].kp  = 0.001*( (vs16)(*(data_buf+4)<<8)|*(data_buf+5) );
-        ctrl_2.PID[PIDROLL].ki  = 0.001*( (vs16)(*(data_buf+6)<<8)|*(data_buf+7) );
-        ctrl_2.PID[PIDROLL].kd  = 0.001*( (vs16)(*(data_buf+8)<<8)|*(data_buf+9) );
-        ctrl_2.PID[PIDPITCH].kp = 0.001*( (vs16)(*(data_buf+10)<<8)|*(data_buf+11) );
-        ctrl_2.PID[PIDPITCH].ki = 0.001*( (vs16)(*(data_buf+12)<<8)|*(data_buf+13) );
-        ctrl_2.PID[PIDPITCH].kd = 0.001*( (vs16)(*(data_buf+14)<<8)|*(data_buf+15) );
-        ctrl_2.PID[PIDYAW].kp   = 0.001*( (vs16)(*(data_buf+16)<<8)|*(data_buf+17) );
-        ctrl_2.PID[PIDYAW].ki   = 0.001*( (vs16)(*(data_buf+18)<<8)|*(data_buf+19) );
-        ctrl_2.PID[PIDYAW].kd   = 0.001*( (vs16)(*(data_buf+20)<<8)|*(data_buf+21) );
-        ANO_DT_Send_Check(*(data_buf+2),sum);
-                Param_SavePID();
-    }
+//    if(*(data_buf+2)==0X10)                             //PID1
+//    {
+//        ctrl_1.PID[PIDROLL].kp  = 0.001*( (vs16)(*(data_buf+4)<<8)|*(data_buf+5) );
+//        ctrl_1.PID[PIDROLL].ki  = 0.001*( (vs16)(*(data_buf+6)<<8)|*(data_buf+7) );
+//        ctrl_1.PID[PIDROLL].kd  = 0.001*( (vs16)(*(data_buf+8)<<8)|*(data_buf+9) );
+//        ctrl_1.PID[PIDPITCH].kp = 0.001*( (vs16)(*(data_buf+10)<<8)|*(data_buf+11) );
+//        ctrl_1.PID[PIDPITCH].ki = 0.001*( (vs16)(*(data_buf+12)<<8)|*(data_buf+13) );
+//        ctrl_1.PID[PIDPITCH].kd = 0.001*( (vs16)(*(data_buf+14)<<8)|*(data_buf+15) );
+//        ctrl_1.PID[PIDYAW].kp   = 0.001*( (vs16)(*(data_buf+16)<<8)|*(data_buf+17) );
+//        ctrl_1.PID[PIDYAW].ki   = 0.001*( (vs16)(*(data_buf+18)<<8)|*(data_buf+19) );
+//        ctrl_1.PID[PIDYAW].kd   = 0.001*( (vs16)(*(data_buf+20)<<8)|*(data_buf+21) );
+//        ANO_DT_Send_Check(*(data_buf+2),sum);
+//                Param_SavePID();
+//    }
+//    if(*(data_buf+2)==0X11)                             //PID2
+//    {
+//        ctrl_1.PID[PID4].kp     = 0.001*( (vs16)(*(data_buf+4)<<8)|*(data_buf+5) );
+//        ctrl_1.PID[PID4].ki     = 0.001*( (vs16)(*(data_buf+6)<<8)|*(data_buf+7) );
+//        ctrl_1.PID[PID4].kd     = 0.001*( (vs16)(*(data_buf+8)<<8)|*(data_buf+9) );
+//        ctrl_1.PID[PID5].kp     = 0.001*( (vs16)(*(data_buf+10)<<8)|*(data_buf+11) );
+//        ctrl_1.PID[PID5].ki     = 0.001*( (vs16)(*(data_buf+12)<<8)|*(data_buf+13) );
+//        ctrl_1.PID[PID5].kd     = 0.001*( (vs16)(*(data_buf+14)<<8)|*(data_buf+15) );
+//        ctrl_1.PID[PID6].kp   = 0.001*( (vs16)(*(data_buf+16)<<8)|*(data_buf+17) );
+//        ctrl_1.PID[PID6].ki     = 0.001*( (vs16)(*(data_buf+18)<<8)|*(data_buf+19) );
+//        ctrl_1.PID[PID6].kd     = 0.001*( (vs16)(*(data_buf+20)<<8)|*(data_buf+21) );
+//        ANO_DT_Send_Check(*(data_buf+2),sum);
+//                Param_SavePID();
+//    }
+//    if(*(data_buf+2)==0X12)                             //PID3
+//    {   
+//        ctrl_2.PID[PIDROLL].kp  = 0.001*( (vs16)(*(data_buf+4)<<8)|*(data_buf+5) );
+//        ctrl_2.PID[PIDROLL].ki  = 0.001*( (vs16)(*(data_buf+6)<<8)|*(data_buf+7) );
+//        ctrl_2.PID[PIDROLL].kd  = 0.001*( (vs16)(*(data_buf+8)<<8)|*(data_buf+9) );
+//        ctrl_2.PID[PIDPITCH].kp = 0.001*( (vs16)(*(data_buf+10)<<8)|*(data_buf+11) );
+//        ctrl_2.PID[PIDPITCH].ki = 0.001*( (vs16)(*(data_buf+12)<<8)|*(data_buf+13) );
+//        ctrl_2.PID[PIDPITCH].kd = 0.001*( (vs16)(*(data_buf+14)<<8)|*(data_buf+15) );
+//        ctrl_2.PID[PIDYAW].kp   = 0.001*( (vs16)(*(data_buf+16)<<8)|*(data_buf+17) );
+//        ctrl_2.PID[PIDYAW].ki   = 0.001*( (vs16)(*(data_buf+18)<<8)|*(data_buf+19) );
+//        ctrl_2.PID[PIDYAW].kd   = 0.001*( (vs16)(*(data_buf+20)<<8)|*(data_buf+21) );
+//        ANO_DT_Send_Check(*(data_buf+2),sum);
+//                Param_SavePID();
+//    }
     if(*(data_buf+2)==0X13)                             //PID4
     {
         ANO_DT_Send_Check(*(data_buf+2),sum);
@@ -281,36 +279,11 @@ void ANO_DT_Data_Receive_Anl(u8 *data_buf,u8 num)
     }
 }
 
-//void ANO_DT_Send_Version(u8 hardware_type, u16 hardware_ver,u16 software_ver,u16 protocol_ver,u16 bootloader_ver)
-//{
-//    u8 _cnt=0;
-//    data_to_send[_cnt++]=0xAA;
-//    data_to_send[_cnt++]=0xAA;
-//    data_to_send[_cnt++]=0x00;
-//    data_to_send[_cnt++]=0;
-//    
-//    data_to_send[_cnt++]=hardware_type;
-//    data_to_send[_cnt++]=BYTE1(hardware_ver);
-//    data_to_send[_cnt++]=BYTE0(hardware_ver);
-//    data_to_send[_cnt++]=BYTE1(software_ver);
-//    data_to_send[_cnt++]=BYTE0(software_ver);
-//    data_to_send[_cnt++]=BYTE1(protocol_ver);
-//    data_to_send[_cnt++]=BYTE0(protocol_ver);
-//    data_to_send[_cnt++]=BYTE1(bootloader_ver);
-//    data_to_send[_cnt++]=BYTE0(bootloader_ver);
-//    
-//    data_to_send[3] = _cnt-4;
-//    
-//    u8 sum = 0;
-//    for(u8 i=0;i<_cnt;i++)
-//        sum += data_to_send[i];
-//    data_to_send[_cnt++]=sum;
-//    
-//    ANO_DT_Send_Data(data_to_send, _cnt);
-//}
+
 void ANO_DT_Send_Status(float angle_rol, float angle_pit, float angle_yaw, s32 alt, u8 fly_model, u8 armed)
 {
     u8 _cnt=0;
+	  u8 sum = 0,i;
     vs16 _temp;
     vs32 _temp2 = alt;
     
@@ -340,8 +313,8 @@ void ANO_DT_Send_Status(float angle_rol, float angle_pit, float angle_yaw, s32 a
     
     data_to_send[3] = _cnt-4;
     
-    u8 sum = 0;
-    for(u8 i=0;i<_cnt;i++)
+
+    for(i=0;i<_cnt;i++)
         sum += data_to_send[i];
     data_to_send[_cnt++]=sum;
     
@@ -350,6 +323,7 @@ void ANO_DT_Send_Status(float angle_rol, float angle_pit, float angle_yaw, s32 a
 void ANO_DT_Send_Senser(s16 a_x,s16 a_y,s16 a_z,s16 g_x,s16 g_y,s16 g_z,s16 m_x,s16 m_y,s16 m_z,s32 bar)
 {
     u8 _cnt=0;
+	  u8 sum = 0,i;
     vs16 _temp;
     
     data_to_send[_cnt++]=0xAA;
@@ -389,57 +363,19 @@ void ANO_DT_Send_Senser(s16 a_x,s16 a_y,s16 a_z,s16 g_x,s16 g_y,s16 g_z,s16 m_x,
     
     data_to_send[3] = _cnt-4;
     
-    u8 sum = 0;
-    for(u8 i=0;i<_cnt;i++)
+
+    for(i=0;i<_cnt;i++)
         sum += data_to_send[i];
     data_to_send[_cnt++] = sum;
     
     ANO_DT_Send_Data(data_to_send, _cnt);
 }
-//void ANO_DT_Send_RCData(u16 thr,u16 yaw,u16 rol,u16 pit,u16 aux1,u16 aux2,u16 aux3,u16 aux4,u16 aux5,u16 aux6)
-//{
-//    u8 _cnt=0;
-//    
-//    data_to_send[_cnt++]=0xAA;
-//    data_to_send[_cnt++]=0xAA;
-//    data_to_send[_cnt++]=0x03;
-//    data_to_send[_cnt++]=0;
-//    data_to_send[_cnt++]=BYTE1(thr);
-//    data_to_send[_cnt++]=BYTE0(thr);
-//    data_to_send[_cnt++]=BYTE1(yaw);
-//    data_to_send[_cnt++]=BYTE0(yaw);
-//    data_to_send[_cnt++]=BYTE1(rol);
-//    data_to_send[_cnt++]=BYTE0(rol);
-//    data_to_send[_cnt++]=BYTE1(pit);
-//    data_to_send[_cnt++]=BYTE0(pit);
-//    data_to_send[_cnt++]=BYTE1(aux1);
-//    data_to_send[_cnt++]=BYTE0(aux1);
-//    data_to_send[_cnt++]=BYTE1(aux2);
-//    data_to_send[_cnt++]=BYTE0(aux2);
-//    data_to_send[_cnt++]=BYTE1(aux3);
-//    data_to_send[_cnt++]=BYTE0(aux3);
-//    data_to_send[_cnt++]=BYTE1(aux4);
-//    data_to_send[_cnt++]=BYTE0(aux4);
-//    data_to_send[_cnt++]=BYTE1(aux5);
-//    data_to_send[_cnt++]=BYTE0(aux5);
-//    data_to_send[_cnt++]=BYTE1(aux6);
-//    data_to_send[_cnt++]=BYTE0(aux6);
-//
-//    data_to_send[3] = _cnt-4;
-//    
-//    u8 sum = 0;
-//    for(u8 i=0;i<_cnt;i++)
-//        sum += data_to_send[i];
-//    
-//    data_to_send[_cnt++]=sum;
-//    
-//    ANO_DT_Send_Data(data_to_send, _cnt);
-//}
+
 void ANO_DT_Send_Power(u16 votage)
 {
     u8 _cnt=0;
     u16 temp;
-    
+    u8 sum = 0,i;    
     data_to_send[_cnt++]=0xAA;
     data_to_send[_cnt++]=0xAA;
     data_to_send[_cnt++]=0x05;
@@ -451,8 +387,8 @@ void ANO_DT_Send_Power(u16 votage)
     
     data_to_send[3] = _cnt-4;
     
-    u8 sum = 0;
-    for(u8 i=0;i<_cnt;i++)
+
+    for(i=0;i<_cnt;i++)
         sum += data_to_send[i];
     
     data_to_send[_cnt++]=sum;
@@ -462,7 +398,7 @@ void ANO_DT_Send_Power(u16 votage)
 void ANO_DT_Send_MotoPWM(u16 m_1,u16 m_2,u16 m_3,u16 m_4)
 {
     u8 _cnt=0;
-    
+    u8 sum = 0,i;    
     data_to_send[_cnt++]=0xAA;
     data_to_send[_cnt++]=0xAA;
     data_to_send[_cnt++]=0x06;
@@ -479,8 +415,8 @@ void ANO_DT_Send_MotoPWM(u16 m_1,u16 m_2,u16 m_3,u16 m_4)
     
     data_to_send[3] = _cnt-4;
     
-    u8 sum = 0;
-    for(u8 i=0;i<_cnt;i++)
+
+    for(i=0;i<_cnt;i++)
         sum += data_to_send[i];
     
     data_to_send[_cnt++]=sum;
@@ -489,7 +425,8 @@ void ANO_DT_Send_MotoPWM(u16 m_1,u16 m_2,u16 m_3,u16 m_4)
 }
 void ANO_DT_Send_PID(u8 group,float p1_p,float p1_i,float p1_d,float p2_p,float p2_i,float p2_d,float p3_p,float p3_i,float p3_d)
 {
-    u8 _cnt=0;
+    u8 _cnt=0,i;
+	  u8 sum = 0;
     vs16 _temp;
     
     data_to_send[_cnt++]=0xAA;
@@ -528,8 +465,8 @@ void ANO_DT_Send_PID(u8 group,float p1_p,float p1_i,float p1_d,float p2_p,float 
     
     data_to_send[3] = _cnt-4;
     
-    u8 sum = 0;
-    for(u8 i=0;i<_cnt;i++)
+
+    for(i=0;i<_cnt;i++)
         sum += data_to_send[i];
     
     data_to_send[_cnt++]=sum;
@@ -537,4 +474,4 @@ void ANO_DT_Send_PID(u8 group,float p1_p,float p1_i,float p1_d,float p2_p,float 
     ANO_DT_Send_Data(data_to_send, _cnt);
 }
 
-/******************* (C) COPYRIGHT 2014 ANO TECH *****END OF FILE************/
+

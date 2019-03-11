@@ -3,7 +3,7 @@
 ..\obj\flight_control.o: ..\MATH\inc\kalman.h
 ..\obj\flight_control.o: ..\USER\stm32f10x.h
 ..\obj\flight_control.o: ..\CORE\core_cm3.h
-..\obj\flight_control.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\flight_control.o: D:\keil\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\flight_control.o: ..\USER\system_stm32f10x.h
 ..\obj\flight_control.o: ..\USER\stm32f10x_conf.h
 ..\obj\flight_control.o: ..\STM32F10X_FWLib\inc\stm32f10x_adc.h
@@ -30,7 +30,7 @@
 ..\obj\flight_control.o: ..\STM32F10X_FWLib\inc\stm32f10x_usart.h
 ..\obj\flight_control.o: ..\STM32F10X_FWLib\inc\stm32f10x_wwdg.h
 ..\obj\flight_control.o: ..\STM32F10X_FWLib\inc\misc.h
-..\obj\flight_control.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+..\obj\flight_control.o: D:\keil\ARM\ARMCC\Bin\..\include\math.h
 ..\obj\flight_control.o: ..\HARDWEAR\inc\mpu6050.h
 ..\obj\flight_control.o: ..\HARDWEAR\inc\i2c.h
 ..\obj\flight_control.o: ..\HARDWEAR\inc\mpu6050.h

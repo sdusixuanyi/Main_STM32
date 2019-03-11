@@ -128,6 +128,7 @@ struct Set_value        //pid中的各种目标值    程序中也用于存储误差和误差累积
 };
 
 
+
 void flight_control(int COMorDMAmode, int COMmode);
 
 void MPU6050_get_offset(int mode);

@@ -2,7 +2,7 @@
 ..\obj\i2c.o: ..\HARDWEAR\inc\i2c.h
 ..\obj\i2c.o: ..\USER\stm32f10x.h
 ..\obj\i2c.o: ..\CORE\core_cm3.h
-..\obj\i2c.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\i2c.o: D:\keil\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\i2c.o: ..\USER\system_stm32f10x.h
 ..\obj\i2c.o: ..\USER\stm32f10x_conf.h
 ..\obj\i2c.o: ..\STM32F10X_FWLib\inc\stm32f10x_adc.h
@@ -29,7 +29,7 @@
 ..\obj\i2c.o: ..\STM32F10X_FWLib\inc\stm32f10x_usart.h
 ..\obj\i2c.o: ..\STM32F10X_FWLib\inc\stm32f10x_wwdg.h
 ..\obj\i2c.o: ..\STM32F10X_FWLib\inc\misc.h
-..\obj\i2c.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+..\obj\i2c.o: D:\keil\ARM\ARMCC\Bin\..\include\math.h
 ..\obj\i2c.o: ..\HARDWEAR\inc\mpu6050.h
 ..\obj\i2c.o: ..\HARDWEAR\inc\i2c.h
 ..\obj\i2c.o: ..\MATH\inc\myMath.h

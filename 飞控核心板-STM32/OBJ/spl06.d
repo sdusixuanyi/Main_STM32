@@ -3,7 +3,7 @@
 ..\obj\spl06.o: ..\HARDWEAR\inc\i2c.h
 ..\obj\spl06.o: ..\USER\stm32f10x.h
 ..\obj\spl06.o: ..\CORE\core_cm3.h
-..\obj\spl06.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\spl06.o: D:\keil\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\spl06.o: ..\USER\system_stm32f10x.h
 ..\obj\spl06.o: ..\USER\stm32f10x_conf.h
 ..\obj\spl06.o: ..\STM32F10X_FWLib\inc\stm32f10x_adc.h
@@ -30,7 +30,7 @@
 ..\obj\spl06.o: ..\STM32F10X_FWLib\inc\stm32f10x_usart.h
 ..\obj\spl06.o: ..\STM32F10X_FWLib\inc\stm32f10x_wwdg.h
 ..\obj\spl06.o: ..\STM32F10X_FWLib\inc\misc.h
-..\obj\spl06.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+..\obj\spl06.o: D:\keil\ARM\ARMCC\Bin\..\include\math.h
 ..\obj\spl06.o: ..\HARDWEAR\inc\mpu6050.h
 ..\obj\spl06.o: ..\HARDWEAR\inc\i2c.h
 ..\obj\spl06.o: ..\MATH\inc\myMath.h

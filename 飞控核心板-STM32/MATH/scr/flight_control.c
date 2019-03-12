@@ -3,8 +3,8 @@
 extern unsigned char raw_data[14];
 extern short int translated_data[7];     //将6050的原始14个数据化为7个二进制数据，前三个是加速度分别在xyz上的分量，最后三个是角速度，中间的是温度
 
-struct PID_parameter PID_pitch  = {1, 1, 1};  //姿态角PID
-struct PID_parameter PID_roll   = {1, 1, 1};
+struct PID_parameter PID_pitch  = {1, 2, 1};  //姿态角PID
+struct PID_parameter PID_roll   = {1, 3, 1};
 struct PID_parameter PID_yaw    = {1, 1, 1};
 
 struct PID_parameter PID_gyro_x = {1, 1, 1};  //角速度PID

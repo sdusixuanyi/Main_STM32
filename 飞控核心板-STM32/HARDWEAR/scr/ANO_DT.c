@@ -3,7 +3,8 @@
 #include "flight_control.h"
 #include "24l01.h"
 #include "HCSR04.h"
-
+#include "usart.h"
+#include "stm32f10x_usart.h"
 /////////////////////////////////////////////////////////////////////////////////////
 //数据拆分宏定义，在发送大于1字节的数据类型时，比如int16、float等，需要把数据拆分成单独字节进行发送
 #define BYTE0(dwTemp)       ( *( (char *)(&dwTemp)      ) )
@@ -34,6 +35,8 @@ extern float Power_V;
 //此函数应由用户每1ms调用一次
 void ANO_DT_Data_Exchange(void)
 {
+	static u16 mi=10;
+	static int di=1;
     static u8 cnt = 0;
     static u8 senser_cnt    = 10;
     static u8 status_cnt    = 15;
@@ -67,17 +70,21 @@ void ANO_DT_Data_Exchange(void)
         ANO_DT_Send_Senser(offset.accel_x, offset.accel_y, offset.accel_z,offset.gyro_x,offset.gyro_y,offset.gyro_z,0,0,0,0);
     }   
   
-/////////////////////////////////////////////////////////////////////////////////////   
+/////////////////////////////////////////////////////////////////////////////////////  
+
     else if(f.send_motopwm)//传输电机PWM信号
     {
         f.send_motopwm = 0;
-        ANO_DT_Send_MotoPWM(motor_duty[0],motor_duty[1],motor_duty[2],motor_duty[3]);
+        ANO_DT_Send_MotoPWM(mi,motor_duty[1],motor_duty[2],motor_duty[3],mi,motor_duty[1],motor_duty[2],motor_duty[3]);
+					if(mi>10000)di=-1;
+					else if(mi<5) di=1;
+					mi=mi+di*10;
     }   
 /////////////////////////////////////////////////////////////////////////////////////
     else if(f.send_power)//传输电池电量
     {
         f.send_power = 0;
-        ANO_DT_Send_Power(Power_V);
+        ANO_DT_Send_Power(Power_V,2);
     }
 /////////////////////////////////////////////////////////////////////////////////////
     else if(f.send_pid1)//传输PID参数
@@ -105,7 +112,15 @@ void ANO_DT_Data_Exchange(void)
 //移植时，用户应根据自身应用的情况，根据使用的通信方式，实现此函数
 void ANO_DT_Send_Data(u8 *dataToSend , u8 length)
 {
-	NRF24L01_TxPacket(dataToSend);
+				u8 t;
+//	NRF24L01_TxPacket(dataToSend);			//NRF传输方式，适用于飞控核心上面的数据传输
+
+			for(t=0;t<length;t++)							//串口通讯方式，适合于调试版将数据传输到上位机
+			{
+				USART_SendData(USART1,*dataToSend);
+				while( USART_GetFlagStatus(USART1,USART_FLAG_TC)!= SET); 	
+				dataToSend++;
+			}
 }
 
 static void ANO_DT_Send_Check(u8 head, u8 check_sum)//传输校验值
@@ -371,7 +386,7 @@ void ANO_DT_Send_Senser(s16 a_x,s16 a_y,s16 a_z,s16 g_x,s16 g_y,s16 g_z,s16 m_x,
     ANO_DT_Send_Data(data_to_send, _cnt);
 }
 
-void ANO_DT_Send_Power(u16 votage)
+void ANO_DT_Send_Power(u16 votage, u16 current)
 {
     u8 _cnt=0;
     u16 temp;
@@ -384,7 +399,9 @@ void ANO_DT_Send_Power(u16 votage)
     temp = votage;
     data_to_send[_cnt++]=BYTE1(temp);
     data_to_send[_cnt++]=BYTE0(temp);
-    
+    temp = current;
+    data_to_send[_cnt++]=BYTE1(temp);
+    data_to_send[_cnt++]=BYTE0(temp);
     data_to_send[3] = _cnt-4;
     
 
@@ -395,7 +412,7 @@ void ANO_DT_Send_Power(u16 votage)
     
     ANO_DT_Send_Data(data_to_send, _cnt);
 }
-void ANO_DT_Send_MotoPWM(u16 m_1,u16 m_2,u16 m_3,u16 m_4)
+void ANO_DT_Send_MotoPWM(u16 m_1,u16 m_2,u16 m_3,u16 m_4,u16 m_5,u16 m_6,u16 m_7,u16 m_8)
 {
     u8 _cnt=0;
     u8 sum = 0,i;    
@@ -412,6 +429,14 @@ void ANO_DT_Send_MotoPWM(u16 m_1,u16 m_2,u16 m_3,u16 m_4)
     data_to_send[_cnt++]=BYTE0(m_3);
     data_to_send[_cnt++]=BYTE1(m_4);
     data_to_send[_cnt++]=BYTE0(m_4);
+	  data_to_send[_cnt++]=BYTE1(m_5);
+    data_to_send[_cnt++]=BYTE0(m_5);
+    data_to_send[_cnt++]=BYTE1(m_6);
+    data_to_send[_cnt++]=BYTE0(m_6);
+    data_to_send[_cnt++]=BYTE1(m_7);
+    data_to_send[_cnt++]=BYTE0(m_7);
+    data_to_send[_cnt++]=BYTE1(m_8);
+    data_to_send[_cnt++]=BYTE0(m_8);
     
     data_to_send[3] = _cnt-4;
     

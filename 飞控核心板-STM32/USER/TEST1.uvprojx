@@ -634,14 +634,24 @@
           <GroupName>README</GroupName>
           <Files>
             <File>
-              <FileName>guanjiao.txt</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\readme\guanjiao.txt</FilePath>
-            </File>
-            <File>
               <FileName>member.txt</FileName>
               <FileType>5</FileType>
               <FilePath>..\readme\member.txt</FilePath>
+            </File>
+            <File>
+              <FileName>Connection.txt</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\README\Connection.txt</FilePath>
+            </File>
+            <File>
+              <FileName>File_System.txt</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\README\File_System.txt</FilePath>
+            </File>
+            <File>
+              <FileName>Function.txt</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\README\Function.txt</FilePath>
             </File>
           </Files>
         </Group>

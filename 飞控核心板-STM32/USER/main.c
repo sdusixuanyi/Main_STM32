@@ -14,7 +14,9 @@
 #include "iwdg.h"
 #include "spl06.h"
 #include "adc.h"
-
+#include "ANO_DT.h"
+#include "usart.h"
+#include "sys.h"
 
 unsigned char raw_data[14] = {0};
 short int translated_data[7];
@@ -32,6 +34,7 @@ void Init()
 	KEY_Init();
 	delay_init();
 	Adc_Init();
+	uart_init (115200);
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 	//HCSR04_Init();
 //	Beep_Init();
@@ -61,10 +64,13 @@ int main(void)
 //	TIM4_CH2_Duty(600);
 //	TIM4_CH3_Duty(600);
 //	TIM4_CH4_Duty(600);	
-		Power_V=Get_Adc(1);
-    flight_control(COMMON_READ, MPU6050_SOFTWARE);
+		ANO_DT_Data_Exchange();
+//		printf("OK!");
+		Power_V=Get_Adc(1)*330/4096;
 		
-    SPL06_height_process(SPL06_SOFTWARE);			
+//    flight_control(COMMON_READ, MPU6050_SOFTWARE);
+		delay_ms(1);
+//    SPL06_height_process(SPL06_SOFTWARE);			
   }
 }
 

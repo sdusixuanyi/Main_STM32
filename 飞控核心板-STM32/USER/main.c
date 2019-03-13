@@ -68,9 +68,9 @@ int main(void)
 //		printf("OK!");
 		Power_V=Get_Adc(1)*330/4096;
 		
-    flight_control(COMMON_READ, MPU6050_SOFTWARE);
+//    flight_control(COMMON_READ, MPU6050_SOFTWARE);
 		delay_ms(1);
-    SPL06_height_process(SPL06_SOFTWARE);			
+//    SPL06_height_process(SPL06_SOFTWARE);			
   }
 }
 

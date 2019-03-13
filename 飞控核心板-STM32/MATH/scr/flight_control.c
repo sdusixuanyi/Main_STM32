@@ -255,8 +255,8 @@ void Attitude_process(int COMorDMAmode, int COMmode)
 	
 	Get_angle(&attitude, 0.00626);
 	
-	attitude.pitch -= attitude.pitch - offset.pitch;    //得到的姿态角减去静态偏差
-	attitude.roll  -= attitude.roll  - offset.roll;
+	attitude.pitch -= offset.pitch;    //得到的姿态角减去静态偏差
+	attitude.roll  -= offset.roll;
 	
 	attitude.gyro_x = attitude.gyro_x * Gyro_G;         //转化为十进制
 	attitude.gyro_y = attitude.gyro_y * Gyro_G;

@@ -71,10 +71,17 @@ int main(void)
   while (1)
   {	
 		ANO_DT_Data_Exchange();
+<<<<<<< HEAD
 		Power_V=Get_Adc(1)*330*5.54/4096;
 //		delay_ms(1000);
 //		NRF24L01_TxPacket(tmp_buf);
     flight_control(COMMON_READ, MPU6050_SOFTWARE);
+=======
+//		printf("OK!");
+		Power_V=Get_Adc(1)*330/4096;
+		
+//    flight_control(COMMON_READ, MPU6050_SOFTWARE);
+>>>>>>> 34b90385559534c153878666623faf9b16b777ef
 		delay_ms(1);
 //    SPL06_height_process(SPL06_SOFTWARE);			
   }

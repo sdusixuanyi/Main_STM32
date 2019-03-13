@@ -17,6 +17,7 @@
 #include "ANO_DT.h"
 #include "usart.h"
 #include "sys.h"
+#include "24l01.h"
 
 unsigned char raw_data[14] = {0};
 short int translated_data[7];
@@ -24,7 +25,7 @@ float accel[3];
 float gyro[3];
 float Power_V;
 extern int dma_flag;    //dma传输完成后会置1
-//u8 TEXT_Buffer[10] = { "0123456789" };
+u8 tmp_buf[33]={"swedrftgyhujizsxdcfvgbhn"};
 
 
 void Init()
@@ -35,8 +36,9 @@ void Init()
 	delay_init();
 	Adc_Init();
 	uart_init (115200);
+	NRF24L01_Init();
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
-	//HCSR04_Init();
+	HCSR04_Init();
 //	Beep_Init();
 	//TIM4_PWM_Init(8999,7);//PWM=72000/8/(8999+1)=500hz 
 	i2c_init(I2C_SOFTWARE);
@@ -48,27 +50,31 @@ void Init()
 	//timer3_init();
 }
 
+void Check()
+{
+	while(NRF24L01_Check())	//Checking the nrf24l01 is right or not.	
+	{
+		LED_ON(0);
+		delay_ms(200);
+		LED_OFF(0);
+ 		delay_ms(200);
+	}
+	LED_OFF(1);
+}
 
 int main(void)
 {	
   	
 	Init();
+	Check();
 
   while (1)
   {	
-//		LED0=0;
-//		delay_ms(500);
-//		LED0=1;
-//		delay_ms(500);	
-//	TIM4_CH1_Duty(600);
-//	TIM4_CH2_Duty(600);
-//	TIM4_CH3_Duty(600);
-//	TIM4_CH4_Duty(600);	
 		ANO_DT_Data_Exchange();
-//		printf("OK!");
-		Power_V=Get_Adc(1)*330/4096;
-		
-//    flight_control(COMMON_READ, MPU6050_SOFTWARE);
+		Power_V=Get_Adc(1)*330*5.54/4096;
+//		delay_ms(1000);
+//		NRF24L01_TxPacket(tmp_buf);
+    flight_control(COMMON_READ, MPU6050_SOFTWARE);
 		delay_ms(1);
 //    SPL06_height_process(SPL06_SOFTWARE);			
   }

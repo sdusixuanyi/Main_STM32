@@ -4,7 +4,9 @@
 //RTC实时时钟 驱动代码			 
 //正点原子@ALIENTEK
 //2010/6/6
-#include "stm32f10x.h"
+//#include "stm32f10x.h"
+#include "headfile.h"
+
 //时间结构体
 typedef struct 
 {

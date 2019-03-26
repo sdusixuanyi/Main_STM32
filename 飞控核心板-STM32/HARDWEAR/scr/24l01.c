@@ -1,6 +1,6 @@
 #include "24l01.h"
-#include "delay.h"
-#include "spi.h"
+//#include "delay.h"
+//#include "spi.h"
 
     
 const u8 TX_ADDRESS[TX_ADR_WIDTH]={0x34,0x43,0x10,0x10,0x01}; //∑¢ÀÕµÿ÷∑

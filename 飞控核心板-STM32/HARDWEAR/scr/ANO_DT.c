@@ -1,10 +1,10 @@
 #include "ANO_DT.h"
-#include "mpu6050.h"
-#include "flight_control.h"
-#include "24l01.h"
-#include "HCSR04.h"
-#include "usart.h"
-#include "stm32f10x_usart.h"
+//#include "mpu6050.h"
+//#include "flight_control.h"
+//#include "24l01.h"
+//#include "HCSR04.h"
+//#include "usart.h"
+//#include "stm32f10x_usart.h"
 /////////////////////////////////////////////////////////////////////////////////////
 //数据拆分宏定义，在发送大于1字节的数据类型时，比如int16、float等，需要把数据拆分成单独字节进行发送
 #define BYTE0(dwTemp)       ( *( (char *)(&dwTemp)      ) )

@@ -186,7 +186,7 @@ void MPU6050_get_offset(int mode)
 	{
 		MPU6050_get_data(raw_data, mode);
 		
-		MPU6050_data_translation(raw_data, translated_data);
+		MPU6050_data_translation(raw_data, translated_data, mode);
 		
 		offset.gyro_x += translated_data[4];
 		offset.gyro_y += translated_data[5];
@@ -201,7 +201,7 @@ void MPU6050_get_offset(int mode)
 	{
 		MPU6050_get_data(raw_data, mode);
 		
-		MPU6050_data_translation(raw_data, translated_data);
+		MPU6050_data_translation(raw_data, translated_data, mode);
 		
 		translated_data[4] -= offset.gyro_x;         //角速度减去静态偏差
 		translated_data[5] -= offset.gyro_y;
@@ -231,9 +231,9 @@ void MPU6050_get_offset(int mode)
 
 void Attitude_process(int COMorDMAmode, int COMmode)
 {
-	if (COMorDMAmode == COMMON_READ) MPU6050_get_data(raw_data, COMmode);      //常规读取
+	if (COMorDMAmode == NDMA_READ) MPU6050_get_data(raw_data, COMmode);      //非DMA方式读取
 	
-	MPU6050_data_translation(raw_data, translated_data);
+	MPU6050_data_translation(raw_data, translated_data, COMmode);
 	
 	if (COMorDMAmode == DMA_READ)    MPU6050_dma_read(MPU6050_ADDRESS, 0x3B);   //DMA方式读取
 	
@@ -253,7 +253,7 @@ void Attitude_process(int COMorDMAmode, int COMmode)
 	attitude.gyro_y = translated_data[5];
 	attitude.gyro_z = translated_data[6];	
 	
-	Get_angle(&attitude, 0.00626);
+	if( COMmode != MPU6050_DMP )   Get_angle(&attitude, 0.00626);
 	
 	attitude.pitch -= offset.pitch;    //得到的姿态角减去静态偏差
 	attitude.roll  -= offset.roll;

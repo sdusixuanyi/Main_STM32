@@ -1,6 +1,6 @@
 #include "beep.h"
-#include "delay.h"
-#include "time.h"
+//#include "delay.h"
+//#include "time.h"
 
 const u16 tone[]={200,
 	262,294,330,349,392,440,523,

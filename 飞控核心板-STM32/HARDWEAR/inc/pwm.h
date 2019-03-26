@@ -1,6 +1,7 @@
 #ifndef __PWM_H
 #define __PWM_H
-#include "sys.h"
+//#include "sys.h"
+#include "headfile.h"
 
 void TIM4_PWM_Init(u16 arr,u16 psc);//初始化函数，输入分频因子和分频数
 void TIM4_CH1_Duty(u16 duty);//设置通道1占空比

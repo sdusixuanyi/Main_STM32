@@ -1,17 +1,20 @@
 #ifndef _FLIGHT_H_
 #define _FLIGHT_H_
 
-#include "kalman.h"
-#include "mpu6050.h"
-#include "myMath.h"
+//#include "kalman.h"
+//#include "mpu6050.h"
+//#include "myMath.h"
 
-#define COMMON_READ 0
+#include "headfile.h"
+
+//MPU6050是否采用DMA读取方式
+#define NDMA_READ   0
 #define DMA_READ    1
 
 #define ERR_STORE_NUM 10    //误差存储数据组数
-#define STA_DUTY 0          //电机占空比初始值
-#define DUTY_MAX 1          //飞行时允许的最大占空比
-#define DUTY_MIN 0.3        //飞行时允许的最小占空比
+#define STA_DUTY 690          //电机占空比初始值
+#define DUTY_MAX 520          //飞行时允许的最大占空比
+#define DUTY_MIN 350       //飞行时允许的最小占空比
 
 #define DEBUG_MODE_GYRO_X 0    //调试程序下的模式选择
 #define DEBUG_MODE_GYRO_Y 1

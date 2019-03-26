@@ -1,7 +1,7 @@
 #include "stmflash.h"
-#include "delay.h"
-#include "usart.h"
-#include "rtc.h"
+//#include "delay.h"
+//#include "usart.h"
+//#include "rtc.h"
  
  
  u8 TEXT_Buffer[10] = { "0123456789" };

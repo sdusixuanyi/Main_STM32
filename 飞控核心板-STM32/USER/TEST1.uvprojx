@@ -608,6 +608,16 @@
               <FileType>1</FileType>
               <FilePath>..\HARDWEAR\scr\ANO_DT.c</FilePath>
             </File>
+            <File>
+              <FileName>inv_mpu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWEAR\scr\inv_mpu.c</FilePath>
+            </File>
+            <File>
+              <FileName>inv_mpu_dmp_motion_driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWEAR\scr\inv_mpu_dmp_motion_driver.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

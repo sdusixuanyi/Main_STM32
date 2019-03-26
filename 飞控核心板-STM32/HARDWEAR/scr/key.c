@@ -1,5 +1,5 @@
 #include "key.h"
-#include "delay.h"
+//#include "delay.h"
 
  	    
 //按键初始化函数 

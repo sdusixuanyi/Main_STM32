@@ -1,8 +1,11 @@
 #include "timer.h"
-#include "hcsr04.h"
-#include "pwm.h"
-#include "delay.h"
+//#include "hcsr04.h"
+//#include "pwm.h"
+//#include "delay.h"
 long int cycle = 0;            //程序的运行周期数
+
+struct Sys_flag SYSFLAG;
+	
 extern float motor_duty[4];
 extern unsigned char raw_data[14];
 extern short int translated_data[7];
@@ -50,36 +53,9 @@ void TIM3_IRQHandler(void)
 		TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
 		
 		TIM3_flag = 1;		
-		HCSR04_Run();
-		//PID_control(2, 0);
+
+		SYSFLAG_update();
 		
-		if(cycle>1000)
-		{
-			TIM4_CH1_Duty(motor_duty[0]);
-			TIM4_CH2_Duty(motor_duty[1]);
-			TIM4_CH3_Duty(motor_duty[2]);
-			TIM4_CH4_Duty(motor_duty[3]);
-		}
-//		if(cycle==1)
-//		{
-//	TIM4_CH1_Duty(950);
-//	TIM4_CH2_Duty(950);
-//	TIM4_CH3_Duty(950);
-//	TIM4_CH4_Duty(950);
-//		}
-if(cycle==400)
-{
-	TIM4_CH1_Duty(350);
-	TIM4_CH2_Duty(350);
-	TIM4_CH3_Duty(350);
-	TIM4_CH4_Duty(350);
-}if(cycle==800)
-{
-	TIM4_CH1_Duty(600);
-	TIM4_CH2_Duty(600);
-	TIM4_CH3_Duty(600);
-	TIM4_CH4_Duty(600);
-}
 		cycle++;
 	}
 }
@@ -92,4 +68,16 @@ void timer3_init(void)
 	TIM_Cmd(TIM3, ENABLE);	
 }
 
+void SYSFLAG_init(void)
+{
+	SYSFLAG.SendDataPermission = 0;
+	SYSFLAG.AttitudeProcessPermission = 0;
+	SYSFLAG.AttitudeProcessOvertimeErr = 0;
+}
+
+void SYSFLAG_update(void)
+{
+	if(SYSFLAG.AttitudeProcessPermission == 1)   SYSFLAG.AttitudeProcessOvertimeErr ++;     //若触发中断时上一轮的姿态解算未完成，超时数自增
+	else SYSFLAG.AttitudeProcessPermission = 1;
+}
 

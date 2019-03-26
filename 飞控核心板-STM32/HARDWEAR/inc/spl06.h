@@ -1,10 +1,12 @@
 #ifndef _SPL06_H_
 #define _SPL06_H_
 
-#include "i2c.h"
-#include "math.h"
-#include "flight_control.h"
-#include "delay.h"
+//#include "i2c.h"
+//#include "math.h"
+//#include "flight_control.h"
+//#include "delay.h"
+
+#include "headfile.h"
 
 #define SPL06_ADDR 0x76 << 1   //气压计从机地址，使用时需要左移一位然后将最后一位置1或0
 //#define ID_REG 0x0D        //气压计ID寄存器地址

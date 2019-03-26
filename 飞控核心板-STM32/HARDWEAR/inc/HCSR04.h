@@ -1,6 +1,8 @@
 #ifndef _HCSR04_H
 #define _HCSR04_H
-#include "sys.h"
+//#include "sys.h"
+
+#include "headfile.h"
 
 
 extern uint8_t HCSR04_Error,HCSR04_OK,HCSR04_RunFlag,HCSR04_Update;

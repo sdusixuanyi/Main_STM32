@@ -1,7 +1,9 @@
 #ifndef _ANO_DT_H
 #define	_ANO_DT_H
 
-#include "sys.h"
+//#include "sys.h"
+
+#include "headfile.h"
 
 typedef struct 
 {

@@ -1,6 +1,6 @@
 #include "hcsr04.h"
-#include "delay.h"
-#include "time.h"
+//#include "delay.h"
+//#include "time.h"
 
 #define TRIG	GPIO_Pin_15//控制信号，PB15
 #define ECHO	GPIO_Pin_14//返回信号，PB14

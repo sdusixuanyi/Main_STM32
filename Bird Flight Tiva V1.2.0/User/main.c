@@ -10,7 +10,7 @@ int main(void)
     Accel_Calibartion();//加速度计6面校准
     Mag_Calibartion_LS(&WP_Sensor.mag_raw,Circle_Angle);//磁力计椭球校准
 //    RC_Calibration_Check(PPM_Databuf);//遥控器行程校准
-    Save_Or_Reset_PID_Parameter();//运用地面站，修改控制参数
+	Save_Or_Reset_PID_Parameter();//运用地面站，修改控制参数
   }
 }
 

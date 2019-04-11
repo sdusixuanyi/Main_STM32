@@ -20,9 +20,9 @@ void Key_Init(void)
 
 
 
-
+//按键扫描函数，两个按键确定是否翻页1号按键增加页码二号减少
 int16_t Page_Number=0;
-uint8_t Key_Right_Release=0;
+uint8_t Key_Right_Release=0;//等于0有效等于1就按键无效
 bool Key_Scan(uint8_t release)
 {
   if(release==1)  return FALSE;
@@ -51,20 +51,32 @@ bool Key_Scan(uint8_t release)
   }
   return TRUE;
 }
-
+//显示函数，定义各个页码所执行的内容
+/*
+Page_Number
+0 基本的飞行参数，角度高度等信息
+1 xyz三轴便宜量
+2 基本控制数据RCData
+3 控制参数PI
+4 GPS相关信息
+5 光流相关信息
+6 SDK、openmv巡线相关信息
+7 找点相关信息
+8
+*/
 void QuadShow()
 {
   uint16_t i=0;
   if(Page_Number==0)
   {
-    LCD_clear_L(0,0);  LCD_P6x8Str(0,0,"Basic");           write_6_8_number(40,0,Time0_Delta.Time_Delta);   write_6_8_number(70,0,Page_Number+1);write_6_8_number(90,0,0);
+    LCD_clear_L(0,0);  LCD_P6x8Str(0,0,"Basic");           write_6_8_number(40,0,Time0_Delta.Time_Delta);   								write_6_8_number(70,0,Page_Number+1);write_6_8_number(90,0,0);
     LCD_clear_L(0,1);  LCD_P6x8Str(0,1,"Yaw:");            write_6_8_number(40,1,Yaw);                                      write_6_8_number(90,1,Yaw_Gyro);
     LCD_clear_L(0,2);  LCD_P6x8Str(0,2,"Pitch:");          write_6_8_number(40,2,Pitch);                                    write_6_8_number(90,2,Pitch_Gyro);
     LCD_clear_L(0,3);  LCD_P6x8Str(0,3,"Roll:");           write_6_8_number(40,3,Roll);                            					write_6_8_number(90,3,Roll_Gyro);
     LCD_clear_L(0,4);  LCD_P6x8Str(0,4,"Baro:");           write_6_8_number(40,4,(uint32_t)(WP_Sensor.baro_pressure_raw));  write_6_8_number(90,4,WP_Sensor.baro_altitude);
     LCD_clear_L(0,5);  LCD_P6x8Str(0,5,"HC04:");           write_6_8_number(40,5,US_Distance);               			          write_6_8_number(80,5,NamelessQuad.Position[_YAW]);
-    LCD_clear_L(0,6);  LCD_P6x8Str(0,6,"Sate_N:");         write_6_8_number(40,6,GPS_Sate_Num);                    						        write_6_8_number(80,6,NamelessQuad.Speed[_YAW]);
-    LCD_clear_L(0,7);  LCD_P6x8Str(0,7,"GPS_Q");           write_6_8_number(40,7,GPS_Quality);                          							write_6_8_number(80,7,Origion_NamelessQuad.Acceleration[_YAW]);
+    LCD_clear_L(0,6);  LCD_P6x8Str(0,6,"Sate_N:");         write_6_8_number(40,6,GPS_Sate_Num);                    					write_6_8_number(80,6,NamelessQuad.Speed[_YAW]);
+    LCD_clear_L(0,7);  LCD_P6x8Str(0,7,"GPS_Q");           write_6_8_number(40,7,GPS_Quality);                          		write_6_8_number(80,7,Origion_NamelessQuad.Acceleration[_YAW]);
   }
   else  if(Page_Number==1)
   {

@@ -670,7 +670,7 @@ void ANO_DT_Send_MotoPWM(u16 m_1,u16 m_2,u16 m_3,u16 m_4,u16 m_5,u16 m_6,u16 m_7
     data_to_send[_cnt++]=BYTE0(m_3);
     data_to_send[_cnt++]=BYTE1(m_4);
     data_to_send[_cnt++]=BYTE0(m_4);
-		data_to_send[_cnt++]=BYTE1(m_5);
+	data_to_send[_cnt++]=BYTE1(m_5);
     data_to_send[_cnt++]=BYTE0(m_5);
     data_to_send[_cnt++]=BYTE1(m_6);
     data_to_send[_cnt++]=BYTE0(m_6);
@@ -749,13 +749,13 @@ void ANO_SEND_StateMachine(void)//各组数据循环发送
   {
     ANO_Data_Send_Status();
   }
-  else if(ANO_Cnt%10==0)
+  if(ANO_Cnt%10==0)
   {
     ANO_DT_Send_Senser((int16_t)WP_Sensor.accel_raw.x,(int16_t)WP_Sensor.accel_raw.y,(int16_t)WP_Sensor.accel_raw.z,
                        (int16_t)WP_Sensor.gyro_raw.x,(int16_t)WP_Sensor.gyro_raw.y,(int16_t)WP_Sensor.gyro_raw.z,
                        (int16_t)WP_Sensor.mag_raw.x,(int16_t)WP_Sensor.mag_raw.y,(int16_t)WP_Sensor.mag_raw.z);
   }
-  else if(ANO_Cnt%15==0)
+  if(ANO_Cnt%15==0)
   {
 		ANO_DT_Send_Udata(0,0,0,0,0,0,0,0,0);
 //    ANO_DT_Send_RCData(PPM_Databuf[2],PPM_Databuf[3],
@@ -763,16 +763,16 @@ void ANO_SEND_StateMachine(void)//各组数据循环发送
 //                       PPM_Databuf[4],PPM_Databuf[5],
 //                       PPM_Databuf[6],PPM_Databuf[7],0,0);
   }
-	else if(ANO_Cnt%30==0)
+	if(ANO_Cnt%30==0)
 	{
 		 ANO_DT_Send_MotoPWM(Motor_PWM_1,Motor_PWM_2,Motor_PWM_3,Motor_PWM_4,0,0,0,0);
 	}
-	else if(ANO_Cnt%50==0)
+	if(ANO_Cnt%50==0)
 	{
 		Power_V=(u16)ADC_StartSample(0);
 		ANO_DT_Send_Power(Power_V,20);
 	}
-  else if(ANO_Cnt%150==0)//提前终止发送队列
+  if(ANO_Cnt%150==0)//提前终止发送队列
   {
 //    ANO_DT_Send_GPSData(1,GPS_Sate_Num,Longitude_Origion,Latitude_Origion,10);
     ANO_Cnt=0;

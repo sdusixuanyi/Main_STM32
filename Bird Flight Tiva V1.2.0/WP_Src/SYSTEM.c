@@ -5,16 +5,16 @@
 
 void HardWave_Init(void)
 {
-  ConfigureUART0();//串口0初始化，山外地面站、锡月地面站
-  Version_Declaration();//版本说明
+//  ConfigureUART0();//串口0初始化，山外地面站、锡月地面站
+//  Version_Declaration();//版本说明
   Butterworth_Parameter_Init();//滤波器参数初始化
-  PPM_Init();//PPM解析初始化
+//  PPM_Init();//PPM解析初始化
   Init_PWM();//PWM初始化
   OLED_Init();//OLED显示屏初始化
   Bling_Init();//LED状态指示灯初始化
   Quad_Start_Bling();//开机LED预显示
   Key_Init();//板载按键初始化
-  RC_Calibration_Trigger();//遥控器行程标定检查
+//  RC_Calibration_Trigger();//遥控器行程标定检查
   Horizontal_Calibration_Init();//机架水平标定初始化
   PID_Paramter_Init_With_Flash();//PID参数初始化
   Init_I2C();//硬件I2C初始化
@@ -25,7 +25,7 @@ void HardWave_Init(void)
   WP_Quad_Init();//根据观测传感器加速度计、磁力计对姿态四元数初始化
   ConfigureUART1();//串口1初始化，匿名地面站
   ConfigureUART3();//串口3初始化，OPENMV、树莓派视觉模组、SDK模式串口
-  Set_GPS_USART();//串口2初始化，使用UBLOX协议配置GPS模块
+//  Set_GPS_USART();//串口2初始化，使用UBLOX协议配置GPS模块
   ConfigureUART7();//串口7初始化.超声波模块/TOF解析串口	
   ConfigureUART6();//串口6初始化，光流模块LC306数据解析
   ADC_Init();//ADC初始化，检测外部电池电压

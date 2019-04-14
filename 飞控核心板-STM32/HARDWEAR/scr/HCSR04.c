@@ -1,6 +1,6 @@
 #include "hcsr04.h"
-//#include "delay.h"
-//#include "time.h"
+#include "delay.h"
+#include "time.h"
 
 #define TRIG	GPIO_Pin_15//控制信号，PB15
 #define ECHO	GPIO_Pin_14//返回信号，PB14
@@ -56,7 +56,7 @@ void HCSR04_Run(void)
 		GPIO_WriteBit(GPIOB, GPIO_Pin_15, (BitAction)1);
 		delay_us(15);
 		GPIO_WriteBit(GPIOB, GPIO_Pin_15, (BitAction)0);
-		//delay_ms(30);	
+		delay_ms(30);	
 }
 
 
@@ -82,7 +82,7 @@ void TIM2_Int_Init(u16 arr,u16 psc)
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;//
 	NVIC_Init(&NVIC_InitStructure);//
 	
-	//TIM_Cmd(TIM2,ENABLE);
+//	TIM_Cmd(TIM2,ENABLE);
 					 
 }
 
@@ -95,6 +95,7 @@ float HCSR04_Get_Distance(int time)
 
 void TIM2_IRQHandler(void)   //TIM2
 {
+
 	if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET)  //检查TIM2中断是否发生
 	{		
 		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);  //

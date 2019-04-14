@@ -1,6 +1,6 @@
-//#include "sys.h"
-//#include "delay.h"
-//#include "usart.h"
+#include "sys.h"
+#include "delay.h"
+#include "usart.h"
 #include "rtc.h" 		    
 //Mini STM32开发板
 //RTC实时时钟 驱动代码			 

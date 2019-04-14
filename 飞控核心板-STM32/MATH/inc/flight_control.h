@@ -1,20 +1,17 @@
 #ifndef _FLIGHT_H_
 #define _FLIGHT_H_
 
-//#include "kalman.h"
-//#include "mpu6050.h"
-//#include "myMath.h"
+#include "kalman.h"
+#include "mpu6050.h"
+#include "myMath.h"
 
-#include "headfile.h"
-
-//MPU6050是否采用DMA读取方式
-#define NDMA_READ   0
+#define COMMON_READ 0
 #define DMA_READ    1
 
 #define ERR_STORE_NUM 10    //误差存储数据组数
-#define STA_DUTY 690          //电机占空比初始值
-#define DUTY_MAX 520          //飞行时允许的最大占空比
-#define DUTY_MIN 350       //飞行时允许的最小占空比
+#define STA_DUTY 520          //电机占空比初始值
+#define DUTY_MAX 690          //飞行时允许的最大占空比
+#define DUTY_MIN 350        //飞行时允许的最小占空比
 
 #define DEBUG_MODE_GYRO_X 0    //调试程序下的模式选择
 #define DEBUG_MODE_GYRO_Y 1
@@ -40,12 +37,12 @@
 // #define LIM_ERR_YAW_MAX 0
 // #define LIM_ERR_YAW_MIN 0
 
-#define LIM_GYRO_X_MAX 90         //目标角速度限幅
-#define LIM_GYRO_X_MIN -90
-#define LIM_GYRO_Y_MAX 90
-#define LIM_GYRO_Y_MIN -90
-#define LIM_GYRO_Z_MAX 90
-#define LIM_GYRO_Z_MIN -90
+#define LIM_GYRO_X_MAX 0         //目标角速度限幅
+#define LIM_GYRO_X_MIN 0
+#define LIM_GYRO_Y_MAX 0
+#define LIM_GYRO_Y_MIN 0
+#define LIM_GYRO_Z_MAX 0
+#define LIM_GYRO_Z_MIN 0
 
 #define LIM_HEIGHT_MAX 0       //目标高度限幅
 #define LIM_HEIGHT_MIN 0
@@ -129,6 +126,28 @@ struct Set_value        //pid中的各种目标值    程序中也用于存储误差和误差累积
 	
 	float height;
 };
+
+//******************************************************************debug***************************************************
+
+struct debug_data
+{
+	float last_err;
+	float now_error;
+	float delta_error;
+	float Kp;
+	float Ki;
+	float Kd;
+	float temp_duty;
+	float temp_duty_Kd;
+	float temp_duty_Kp;
+	
+	float raw_accel;
+	float kalman_accel;
+	float angle;
+};
+
+
+//**************************************************************************************************************************
 
 
 

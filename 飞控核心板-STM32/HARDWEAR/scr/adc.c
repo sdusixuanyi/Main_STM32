@@ -1,5 +1,5 @@
  #include "adc.h"
-// #include "delay.h"
+ #include "delay.h"
 		   
 //初始化ADC
 //这里我们仅以规则通道为例

@@ -1,7 +1,7 @@
 #ifndef __KEY_H
 #define __KEY_H	 
-//#include "sys.h"
-#include "headfile.h"	 
+#include "sys.h"
+	 
  
 #define KEY0  GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_13)//读取按键0
 #define KEY1  GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_14)//读取按键1

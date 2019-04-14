@@ -1,11 +1,12 @@
 #include "24l01.h"
-//#include "delay.h"
-//#include "spi.h"
+#include "delay.h"
+#include "spi.h"
 
     
 const u8 TX_ADDRESS[TX_ADR_WIDTH]={0x34,0x43,0x10,0x10,0x01}; //发送地址
 const u8 RX_ADDRESS[RX_ADR_WIDTH]={0x34,0x43,0x10,0x10,0x01}; //接收地址
 
+u8 RX_DATA[50];
 
 //初始化24L01的IO口
 
@@ -13,6 +14,8 @@ void NRF24L01_Init(void)
 {  
 	GPIO_InitTypeDef GPIO_InitStructure;
 	SPI_InitTypeDef  SPI_InitStructure; 
+//	EXTI_InitTypeDef EXTI_InitStructure;
+//  NVIC_InitTypeDef NVIC_InitStructure;
 	
  	RCC_APB2PeriphClockCmd(	RCC_APB2Periph_GPIOA|RCC_APB2Periph_GPIOB|RCC_APB2Periph_GPIOC, ENABLE );	
 	
@@ -33,6 +36,25 @@ void NRF24L01_Init(void)
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 
 	GPIO_SetBits(GPIOA,GPIO_Pin_4);
+	
+	
+//		//nRF24L01 NVIC??
+//	NVIC_InitStructure.NVIC_IRQChannel=EXTI3_IRQn;
+//	NVIC_InitStructure.NVIC_IRQChannelSubPriority=3;
+//	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=3;
+//	NVIC_InitStructure.NVIC_IRQChannelCmd=ENABLE;
+//	NVIC_Init(&NVIC_InitStructure);        
+//	//?GPIO??????????
+//	GPIO_EXTILineConfig(GPIO_PortSourceGPIOB,GPIO_PinSource3);
+//	//nRF24L01 EXIT??
+//	EXTI_InitStructure.EXTI_Line=EXTI_Line3;
+//	EXTI_InitStructure.EXTI_Mode=EXTI_Mode_Interrupt;
+//	EXTI_InitStructure.EXTI_Trigger=EXTI_Trigger_Falling;
+//	EXTI_InitStructure.EXTI_LineCmd=ENABLE;
+//	EXTI_Init(&EXTI_InitStructure);
+//	EXTI_ClearITPendingBit(EXTI_Line3);
+	
+	
 	SPI1_Init();    		//初始化SPI
 		
 	SPI_Cmd(SPI1, DISABLE); // 
@@ -52,6 +74,18 @@ void NRF24L01_Init(void)
 	NRF24L01_CE=0; 	//使能24L01
 	NRF24L01_CSN=1;	//SPI片选取消	 	
 }
+
+
+//void EXTI3_IRQHandler(void)
+//{
+//	if (EXTI_GetITStatus(EXTI_Line3)!=RESET)
+//	{
+//		NRF24L01_RX_Mode();
+//		NRF24L01_RxPacket(RX_DATA);
+//		NRF24L01_TX_Mode();
+//		EXTI_ClearITPendingBit(EXTI_Line3); //????
+//	}
+//}	
 //检测24L01是否存在
 //返回值:0，成功;1，失败	
 u8 NRF24L01_Check(void)

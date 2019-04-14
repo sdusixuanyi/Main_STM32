@@ -249,7 +249,7 @@ void Strapdown_INS_High_Kalman(void)
   Test_Period(&SINS_High_Delta);
   Delta_T=SINS_High_Delta.Time_Delta/1000.0f;
   if(Delta_T>2*WP_Duty_Dt||Delta_T<WP_Duty_Dt||isnan(Delta_T)!=0)   Delta_T=WP_Duty_Dt;
-  Observation_Tradeoff(1);
+  Observation_Tradeoff(0);//参数为0代表无超声波参与
   KalmanFilter(Observation_Altitude,//位置观测量
                High_Delay_Cnt,//观测传感器延时量
                &NamelessQuad,//惯导结构体

@@ -36,7 +36,7 @@ void Init_PWM(void)//PWM初始化
   PWMGenConfigure(PWM0_BASE, PWM_GEN_1, PWM_GEN_MODE_DOWN | PWM_GEN_MODE_NO_SYNC);
   
   PWMGenConfigure(PWM0_BASE, PWM_GEN_2, PWM_GEN_MODE_DOWN | PWM_GEN_MODE_NO_SYNC);
-  PWMGenConfigure(PWM0_BASE, PWM_GEN_3, PWM_GEN_MODE_DOWN | PWM_GEN_MODE_NO_SYNC);
+  PWMGenConfigure(PWM0_BASE, PWM_GEN_3, PWM_GEN_MODE_DOWN | PWM_GEN_MODE_NO_SYNC);        //向下计数模式
   // The period is set to 2.5ms (400 Hz)
   period = PWM_Period_MAX; 
   PWMGenPeriodSet(PWM0_BASE, PWM_GEN_0, period); // Set the period
@@ -53,11 +53,11 @@ void Init_PWM(void)//PWM初始化
   // Enable the outputs
   PWMOutputState(PWM0_BASE, PWM_OUT_0_BIT | PWM_OUT_1_BIT | PWM_OUT_2_BIT | PWM_OUT_3_BIT
                  | PWM_OUT_4_BIT | PWM_OUT_5_BIT | PWM_OUT_6_BIT | PWM_OUT_7_BIT, true);
-  PWM_Output(1250,1250,1250,1250,1250,1250,1250,1250);
+  PWM_Output(1094,1094,1094,1094,0,0,0,0);
 }
 
 
-
+//250->8%-->>0~3125;
 void PWM_Output(uint16_t width1,uint16_t width2,uint16_t width3,uint16_t width4,
                 uint16_t width5,uint16_t width6,uint16_t width7,uint16_t width8)
 {
@@ -66,7 +66,7 @@ void PWM_Output(uint16_t width1,uint16_t width2,uint16_t width3,uint16_t width4,
   PWMPulseWidthSet(PWM0_BASE,PWM_OUT_1,width3);//PB7
   PWMPulseWidthSet(PWM0_BASE,PWM_OUT_0,width4);//PB6
   PWMPulseWidthSet(PWM0_BASE,PWM_OUT_5,width5);//PE5
-  PWMPulseWidthSet(PWM0_BASE,PWM_OUT_4,width6);//P43
+  PWMPulseWidthSet(PWM0_BASE,PWM_OUT_4,width6);//PE3
   PWMPulseWidthSet(PWM0_BASE,PWM_OUT_2,width7);//PB4
   PWMPulseWidthSet(PWM0_BASE,PWM_OUT_3,width8);//PB5
 }

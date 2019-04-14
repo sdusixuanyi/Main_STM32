@@ -788,12 +788,6 @@ void Save_Or_Reset_PID_Parameter()
     
     Sort_PID_Flag=0;
     
-    ANO_Send_PID_Flag[0]=1;//回复默认参数后，将更新的数据发送置地面站
-    ANO_Send_PID_Flag[1]=1;
-    ANO_Send_PID_Flag[2]=1;
-    ANO_Send_PID_Flag[3]=1;
-    ANO_Send_PID_Flag[4]=1;
-    ANO_Send_PID_Flag[5]=1;
   }
   else if(Sort_PID_Flag==3)//将复位PID参数，并写入Flash
   {
@@ -856,13 +850,6 @@ void Save_Or_Reset_PID_Parameter()
     Save_PID_Parameter();
     
     Sort_PID_Flag=0;
-    
-    ANO_Send_PID_Flag[0]=1;//回复默认参数后，将更新的数据发送置地面站
-    ANO_Send_PID_Flag[1]=1;
-    ANO_Send_PID_Flag[2]=1;
-    ANO_Send_PID_Flag[3]=1;
-    ANO_Send_PID_Flag[4]=1;
-    ANO_Send_PID_Flag[5]=1;
   }
 }
 

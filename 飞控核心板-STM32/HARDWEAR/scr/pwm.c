@@ -1,5 +1,5 @@
 #include "pwm.h"
-//#include "led.h"
+#include "led.h"
  
 //PWM初始化
 //arr:分频因子
@@ -31,14 +31,14 @@
         TIM_OCInitStructure.TIM_Pulse = 0; 
         TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_Low;
         TIM_OC1Init(TIM4, &TIM_OCInitStructure);  
-		TIM_OC2Init(TIM4, &TIM_OCInitStructure);
-		TIM_OC3Init(TIM4, &TIM_OCInitStructure);
-		TIM_OC4Init(TIM4, &TIM_OCInitStructure);
+				TIM_OC2Init(TIM4, &TIM_OCInitStructure);
+				TIM_OC3Init(TIM4, &TIM_OCInitStructure);
+				TIM_OC4Init(TIM4, &TIM_OCInitStructure);
 
         TIM_OC1PreloadConfig(TIM4, TIM_OCPreload_Enable);  
-		TIM_OC2PreloadConfig(TIM4, TIM_OCPreload_Enable); 
-		TIM_OC3PreloadConfig(TIM4, TIM_OCPreload_Enable); 
-		TIM_OC4PreloadConfig(TIM4, TIM_OCPreload_Enable); 
+				TIM_OC2PreloadConfig(TIM4, TIM_OCPreload_Enable); 
+				TIM_OC3PreloadConfig(TIM4, TIM_OCPreload_Enable); 
+				TIM_OC4PreloadConfig(TIM4, TIM_OCPreload_Enable); 
         TIM_ARRPreloadConfig(TIM4, ENABLE); 
 
 		TIM_Cmd(TIM4, ENABLE);                                                                                     

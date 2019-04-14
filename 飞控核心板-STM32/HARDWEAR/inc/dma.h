@@ -1,8 +1,7 @@
 #ifndef _DMA_H_
 #define _DMA_H_
 
-//#include "stm32f10x.h"
-#include "headfile.h"
+#include "stm32f10x.h"
 
 
 #define I2C1_DR_ADDR  0x40005410    //i2c接收数据寄存器

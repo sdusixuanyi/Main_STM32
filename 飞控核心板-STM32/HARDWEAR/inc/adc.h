@@ -1,8 +1,6 @@
 #ifndef __ADC_H
 #define __ADC_H	
-//#include "sys.h"
-
-#include "headfile.h"
+#include "sys.h"
 
 
 void Adc_Init(void);//初始化函数，将ADC—CH1通道初始化

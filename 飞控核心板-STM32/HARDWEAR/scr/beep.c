@@ -1,22 +1,20 @@
 #include "beep.h"
-//#include "delay.h"
-//#include "time.h"
+#include "delay.h"
+#include "time.h"
 
 const u16 tone[]={200,
-	262,294,330,349,392,440,523,
-	530,587,659,698,784,880,988,
-	1047,1175,1319,1397,1568,1760,1967
-};			//定义频率数组用来发出不同频率的声音
-
+	262,294,330,349,392,440,523,//????
+	530,587,659,698,784,880,988,//????
+	1047,1175,1319,1397,1568,1760,1967//????
+};
 
 void TIM3_PWM_Init(u16 arr,u16 psc);
-
 void Beep_Init(void)
 {
 	TIM3_PWM_Init(8999,71);//72mhz/(8999+1)*(71+1)
 }
 
-//初始化TIM3-CH4 PB1
+//??????3????TIM3-CH4 PB1
 void TIM3_PWM_Init(u16 arr,u16 psc)
 {                                                          
         GPIO_InitTypeDef GPIO_InitStructure;
@@ -42,20 +40,20 @@ void TIM3_PWM_Init(u16 arr,u16 psc)
         TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable; 
         TIM_OCInitStructure.TIM_Pulse = 0; 
         TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_Low;
-		TIM_OC3Init(TIM3, &TIM_OCInitStructure);
+		TIM_OC4Init(TIM3, &TIM_OCInitStructure);
 
-		TIM_OC3PreloadConfig(TIM3, TIM_OCPreload_Enable); 
+		TIM_OC4PreloadConfig(TIM3, TIM_OCPreload_Enable); 
         TIM_ARRPreloadConfig(TIM3, ENABLE); 
 
-		TIM_Cmd(TIM3, DISABLE);                                                                                     
+		TIM_Cmd(TIM3, ENABLE);                                                                                     
 }
 
 
-//打开蜂鸣器,mode音调选择,num音符选择
+//?????,mode??,?,??????,num??????
 void Beep_ON(u8 mode,u8 num)
 {
 	u16 fhz=0,tone_num;
-	tone_num=mode*7+num;
+	tone_num=mode+num*7;
 	TIM_Cmd(TIM3, ENABLE);
 	switch(tone_num)
 	{
@@ -83,13 +81,13 @@ void Beep_ON(u8 mode,u8 num)
 		default :fhz=tone[0];
 	}
 	TIM_SetAutoreload(TIM3,(1000000/fhz)-1);
-	TIM_SetCompare3(TIM3,((1000000/fhz)-1)/2+1);
+	TIM_SetCompare4(TIM3,((1000000/fhz)-1)/2+1);
 }
 
-//关掉蜂鸣器
+//?????,?????????????
 void Beep_OFF(void )
 {
-	TIM_SetCompare3(TIM3,0);
+	TIM_SetCompare4(TIM3,0);
 	TIM_Cmd(TIM3, DISABLE);
 }
 

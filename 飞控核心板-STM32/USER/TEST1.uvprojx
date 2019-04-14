@@ -175,7 +175,7 @@
           </Flash1>
           <bUseTDR>1</bUseTDR>
           <Flash2>BIN\UL2CM3.DLL</Flash2>
-          <Flash3></Flash3>
+          <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
           <pFcarmGrp></pFcarmGrp>
@@ -438,6 +438,11 @@
               <FileType>1</FileType>
               <FilePath>.\system_stm32f10x.c</FilePath>
             </File>
+            <File>
+              <FileName>DEBUG_para.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\DEBUG_para.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -607,16 +612,6 @@
               <FileName>ANO_DT.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWEAR\scr\ANO_DT.c</FilePath>
-            </File>
-            <File>
-              <FileName>inv_mpu.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWEAR\scr\inv_mpu.c</FilePath>
-            </File>
-            <File>
-              <FileName>inv_mpu_dmp_motion_driver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWEAR\scr\inv_mpu_dmp_motion_driver.c</FilePath>
             </File>
           </Files>
         </Group>

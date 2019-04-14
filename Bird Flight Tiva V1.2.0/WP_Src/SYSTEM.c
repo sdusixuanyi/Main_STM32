@@ -35,36 +35,38 @@ void HardWave_Init(void)
 }
 
 
-void ESC_HardWave_Init()//只初始化校准电调的必要资源
+void ESC_HardWave_Init()//只初始化校准电调的必要资源 ,已经校准
 {
-  OLED_Init_Fast();
-  PPM_Init();
+//  OLED_Init_Fast();
+//  PPM_Init();
   Init_PWM();
   delay_ms(100);
-  WriteFlashParameter(ESC_CALIBRATION_FLAG,0,&Table_Parameter);//写零避免下次上电再次进入
+//  WriteFlashParameter(ESC_CALIBRATION_FLAG,0,&Table_Parameter);//写零避免下次上电再次进入
+	PWM_Output(3000,3000,3000,3000,0,0,0,0); //初始化高电平输出
+	delay_ms(4000);
+	PWM_Output(1094,1094,1094,1094,0,0,0,0); //初始化di电平输出
+	delay_ms(3000);
   while(1)
   {
-    ESC_Calibration();
-    LCD_clear_L(0,0);LCD_clear_L(0,1);LCD_P8x16Str(0,0,"Please Move Thr");
-    LCD_clear_L(0,2);LCD_clear_L(0,3);LCD_P8x16Str(0,2,"Down When ESC");
-    LCD_clear_L(0,4);LCD_clear_L(0,5);LCD_P8x16Str(0,4,"Beep Beep");
-    LCD_P6x8Str(80,4,"Thr:");
-    write_6_8_number(80,5,PPM_Databuf[2]);
-    LCD_clear_L(0,6);LCD_P6x8Str(0,6,"Repower When Set Up");
+//    ESC_Calibration();
+//    LCD_clear_L(0,0);LCD_clear_L(0,1);LCD_P8x16Str(0,0,"Please Move Thr");
+//    LCD_clear_L(0,2);LCD_clear_L(0,3);LCD_P8x16Str(0,2,"Down When ESC");
+//    LCD_clear_L(0,4);LCD_clear_L(0,5);LCD_P8x16Str(0,4,"Beep Beep");
+//    LCD_P6x8Str(80,4,"Thr:");
+//    write_6_8_number(80,5,PPM_Databuf[2]);
+//    LCD_clear_L(0,6);LCD_P6x8Str(0,6,"Repower When Set Up");
+	PWM_Output(1250,1250,1250,1250,0,0,0,0);
   }
 }
 
 void WP_Init(void)
 {
   System_Start_Init();//系统启动初始化
-  ReadFlashParameterOne(ESC_CALIBRATION_FLAG,&ESC_Calibration_Flag);
-  if(ESC_Calibration_Flag==1)
-  {
-    ESC_HardWave_Init();//只初始化校准电调的必要资源 
-  }
-  else
-  {
+//  ReadFlashParameterOne(ESC_CALIBRATION_FLAG,&ESC_Calibration_Flag);
+
+//    ESC_HardWave_Init();//只初始化校准电调的必要资源 
+
     HardWave_Init();//飞控板内部资源、相关外设初始化
-  }
+
 }
 

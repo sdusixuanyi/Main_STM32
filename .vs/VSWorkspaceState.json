@@ -1,11 +1,9 @@
 {
   "ExpandedNodes": [
     "",
-    "\\飞控核心板-STM32",
-    "\\飞控核心板-STM32\\HARDWEAR",
-    "\\飞控核心板-STM32\\HARDWEAR\\inc",
-    "\\飞控核心板-STM32\\HARDWEAR\\scr"
+    "\\Bird Flight Tiva V1.2.0",
+    "\\Bird Flight Tiva V1.2.0\\WP_Src"
   ],
-  "SelectedNode": "\\飞控核心板-STM32\\HARDWEAR\\inc\\GCS.h",
+  "SelectedNode": "\\Bird Flight Tiva V1.2.0\\WP_Src\\Time_Cnt.c",
   "PreviewInSolutionExplorer": false
 }

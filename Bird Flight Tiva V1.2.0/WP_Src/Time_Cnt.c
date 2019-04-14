@@ -18,15 +18,15 @@ Testime Time0_Delta;
 void TIMER0A_Handler(void)//系统调度中断函数
 {
   Test_Period(&Time0_Delta);
-  Remote_Control();//遥控器数据解析
+//  Remote_Control();//遥控器数据解析
   Get_Status_Feedback();//获取姿态数据、水平与竖直方向惯导数据
-  US_100_Statemachine();//超声波传感器状态机更新
-  Optflow_Statemachine();//光流状态机，初始化时存在光流外设
-  SDK_Data_Prase();//SDK数据解析
-  GPS_Data_Prase();//GPS数据解析
-  KalmanFilter_Horizontal();//水平位置GPS双观测量Kalman滤波融合	
+//  US_100_Statemachine();//超声波传感器状态机更新
+//  Optflow_Statemachine();//光流状态机，初始化时存在光流外设
+//  SDK_Data_Prase();//SDK数据解析
+//  GPS_Data_Prase();//GPS数据解析
+//  KalmanFilter_Horizontal();//水平位置GPS双观测量Kalman滤波融合	
   CarryPilot_Control();//总控制器
-  Calibration_Check_All();//总校准函数
+//  Calibration_Check_All();//总校准函数
   Bling_Working(Bling_Mode);//状态指示灯运行
   TimerIntClear(TIMER0_BASE,TIMER_TIMA_TIMEOUT);
 }

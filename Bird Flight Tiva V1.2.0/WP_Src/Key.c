@@ -69,7 +69,7 @@ void QuadShow()
   uint16_t i=0;
   if(Page_Number==0)
   {
-    LCD_clear_L(0,0);  LCD_P6x8Str(0,0,"Basic");           write_6_8_number(40,0,Time0_Delta.Time_Delta);   								write_6_8_number(70,0,Page_Number+1);write_6_8_number(90,0,0);
+    LCD_clear_L(0,0);  LCD_P6x8Str(0,0,"Basic");           write_6_8_number(40,0,Time0_Delta.Time_Delta);   				write_6_8_number(70,0,Page_Number+1);write_6_8_number(90,0,Power_V);
     LCD_clear_L(0,1);  LCD_P6x8Str(0,1,"Yaw:");            write_6_8_number(40,1,Yaw);                                      write_6_8_number(90,1,Yaw_Gyro);
     LCD_clear_L(0,2);  LCD_P6x8Str(0,2,"Pitch:");          write_6_8_number(40,2,Pitch);                                    write_6_8_number(90,2,Pitch_Gyro);
     LCD_clear_L(0,3);  LCD_P6x8Str(0,3,"Roll:");           write_6_8_number(40,3,Roll);                            					write_6_8_number(90,3,Roll_Gyro);

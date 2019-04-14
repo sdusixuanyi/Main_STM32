@@ -1,11 +1,9 @@
 #include "stmflash.h"
-//#include "delay.h"
-//#include "usart.h"
-//#include "rtc.h"
+#include "delay.h"
+#include "usart.h"
+#include "rtc.h"
  
  
- u8 TEXT_Buffer[10] = { "0123456789" };
- u8 datatemp[SIZE];
 //读取指定地址的半字(16位数据)
 //faddr:读地址(此地址必须为2的倍数!!)
 //返回值:对应数据.
@@ -98,23 +96,6 @@ void STMFLASH_Read(u32 ReadAddr,u16 *pBuffer,u16 NumToRead)
 	}
 }
 
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void STMFLASH_Date(void)
-{
-	TEXT_Buffer[0] = calendar.w_month / 10 + 0x30;
-	TEXT_Buffer[1] = calendar.w_month % 10 + 0x30;
-	TEXT_Buffer[2] = calendar.w_date / 10 + 0x30;
-	TEXT_Buffer[3] = calendar.w_date % 10 + 0x30;
-	TEXT_Buffer[4] = calendar.hour / 10 + 0x30;
-	TEXT_Buffer[5] = calendar.hour % 10 + 0x30;
-	TEXT_Buffer[6] = calendar.min / 10 + 0x30;
-	TEXT_Buffer[7] = calendar.min % 10 + 0x30;
-	TEXT_Buffer[8] = calendar.sec / 10 + 0x30;
-	TEXT_Buffer[9] = calendar.sec % 10 + 0x30;
-	STMFLASH_Write(FLASH_SAVE_ADDR, (u16*)TEXT_Buffer, SIZE);
-}
 
 
 

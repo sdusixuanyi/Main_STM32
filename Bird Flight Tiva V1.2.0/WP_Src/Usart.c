@@ -318,7 +318,7 @@ void ANO_DT_Data_Receive_Prepare(u8 data)
 }
 
 
-void ANO_DT_Check(u8 num)
+void ANO_DT_Check(u8 num,u32 _temp2)
 {
 	data_to_send[0]=0xAA;
 	data_to_send[1]=0x05;
@@ -327,11 +327,11 @@ void ANO_DT_Check(u8 num)
 	data_to_send[4]=0x06;
 	data_to_send[5]=0x00;
 	data_to_send[6]=num;
-	data_to_send[7]=0x00;
-	data_to_send[8]=0x00;
-	data_to_send[9]=0x00;
-	data_to_send[10]=0x01;
-	data_to_send[11]=0x46+num;
+	data_to_send[7] = BYTE3(_temp2);
+	data_to_send[8] = BYTE2(_temp2);
+	data_to_send[9] = BYTE1(_temp2);
+	data_to_send[10] = BYTE0(_temp2);
+	data_to_send[11]=0x45+num+ BYTE3(_temp2)+ BYTE2(_temp2)+ BYTE1(_temp2)+ BYTE0(_temp2);
 	USART1_Send(data_to_send,12);
 }
 
@@ -356,6 +356,7 @@ void ANO_DT_Data_Receive_Anl(u8 *data_buf,u8 num)//ANO数据解析
 				case 0x05:  break;		//BARO校准
 				default: break;
 				}
+				USART1_Send (data_buf, num);
 			}
 			else if(*(data_buf+5)==0x02)
 			{
@@ -367,6 +368,7 @@ void ANO_DT_Data_Receive_Anl(u8 *data_buf,u8 num)//ANO数据解析
 				case 0xAF:  break;		//全部恢复默认
 				default: break;
 				}
+				USART1_Send (data_buf, num);
 			}
 			else if (*(data_buf + 5) == 0x10)
 			{
@@ -385,11 +387,59 @@ void ANO_DT_Data_Receive_Anl(u8 *data_buf,u8 num)//ANO数据解析
 				case 0xA0:	break;			//紧急停机
 				default: break;
 				}
+				USART1_Send (data_buf, num);
 			}else if(*(data_buf+5)==0xE1)
-			{
-				ANO_DT_Check(*(data_buf+7));
+				switch (*(data_buf + 6))
+				{
+				case 1:	ANO_DT_Check(*(data_buf + 7), 1000 * Total_Controller.Roll_Gyro_Control.Kp); break;
+				case 2:	ANO_DT_Check(*(data_buf + 7), 1000 * Total_Controller.Roll_Gyro_Control.Ki); break;
+				case 3:	ANO_DT_Check(*(data_buf + 7), 100 * Total_Controller.Roll_Gyro_Control.Kd); break;
+				case 4:	ANO_DT_Check(*(data_buf + 7), 1000 * Total_Controller.Pitch_Gyro_Control.Kp); break;
+				case 5:	ANO_DT_Check(*(data_buf + 7), 1000 * Total_Controller.Pitch_Gyro_Control.Ki); break;
+				case 6:	ANO_DT_Check(*(data_buf + 7), 100 * Total_Controller.Pitch_Gyro_Control.Kd); break;
+				case 7:	ANO_DT_Check(*(data_buf + 7), 1000 * Total_Controller.Yaw_Gyro_Control.Kp); break;
+				case 8:	ANO_DT_Check(*(data_buf + 7), 1000 * Total_Controller.Yaw_Gyro_Control.Ki); break;
+				case 9:	ANO_DT_Check(*(data_buf + 7), 100 * Total_Controller.Yaw_Gyro_Control.Kd); break;
+				case 10:ANO_DT_Check(*(data_buf + 7), 1000 * Total_Controller.Roll_Angle_Control.Kp); break;
+				case 11:ANO_DT_Check(*(data_buf + 7), 1000 * Total_Controller.Roll_Angle_Control.Ki); break;
+				case 12:ANO_DT_Check(*(data_buf + 7), 100 * Total_Controller.Roll_Angle_Control.Kd); break;
+				case 13:ANO_DT_Check(*(data_buf + 7), 1000 * Total_Controller.Pitch_Angle_Control.Kp); break;
+				case 14:ANO_DT_Check(*(data_buf + 7), 1000 * Total_Controller.Pitch_Angle_Control.Ki); break;
+				case 15:ANO_DT_Check(*(data_buf + 7), 100 * Total_Controller.Pitch_Angle_Control.Kd); break;
+				case 16:ANO_DT_Check(*(data_buf + 7), 1000 * Total_Controller.Yaw_Angle_Control.Kp); break;
+				case 17:ANO_DT_Check(*(data_buf + 7), 1000 * Total_Controller.Yaw_Angle_Control.Ki); break;
+				case 18:ANO_DT_Check(*(data_buf + 7), 100 * Total_Controller.Yaw_Angle_Control.Kd); break;
+				case 19:ANO_DT_Check(*(data_buf + 7), 1000 * Total_Controller.High_Speed_Control.Kp); break;
+				case 20:ANO_DT_Check(*(data_buf + 7), 1000 * Total_Controller.High_Speed_Control.Ki); break;
+				case 21:ANO_DT_Check(*(data_buf + 7), 100 * Total_Controller.High_Speed_Control.Kd); break;
+				case 22:ANO_DT_Check(*(data_buf + 7), 1000 * Total_Controller.High_Position_Control.Kp); break;
+				case 23:ANO_DT_Check(*(data_buf + 7), 1000 * Total_Controller.High_Position_Control.Ki); break;
+				case 24:ANO_DT_Check(*(data_buf + 7), 100 * Total_Controller.High_Position_Control.Kd); break;
+				case 25:ANO_DT_Check(*(data_buf + 7), 1000 * Total_Controller.Latitude_Speed_Control.Kp); break;
+				case 26:ANO_DT_Check(*(data_buf + 7), 1000 * Total_Controller.Latitude_Speed_Control.Ki); break;
+				case 27:ANO_DT_Check(*(data_buf + 7), 100 * Total_Controller.Latitude_Speed_Control.Kd); break;
+				case 28:ANO_DT_Check(*(data_buf + 7), 1000 * Total_Controller.Longitude_Position_Control.Kp); break;
+				case 29:ANO_DT_Check(*(data_buf + 7), 1000 * Total_Controller.Longitude_Position_Control.Ki); break;
+				case 30:ANO_DT_Check(*(data_buf + 7), 100 * Total_Controller.Longitude_Position_Control.Kd); break;
+				case 31:ANO_DT_Check(*(data_buf + 7), 1000 * Total_Controller.High_Acce_Control.Kp); break;
+				case 32:ANO_DT_Check(*(data_buf + 7), 1000 * Total_Controller.High_Acce_Control.Ki); break;
+				case 33:ANO_DT_Check(*(data_buf + 7), 100 * Total_Controller.High_Acce_Control.Kd); break;
+				case 34:ANO_DT_Check(*(data_buf + 7), 1000 * Total_Controller.Optical_Position_Control.Kp); break;
+				case 35:ANO_DT_Check(*(data_buf + 7), 1000 * Total_Controller.Optical_Position_Control.Ki); break;
+				case 36:ANO_DT_Check(*(data_buf + 7), 100 * Total_Controller.Optical_Position_Control.Kd); break;
+				case 37:ANO_DT_Check(*(data_buf + 7), 1000 * Total_Controller.Optical_Speed_Control.Kp); break;
+				case 38:ANO_DT_Check(*(data_buf + 7), 1000 * Total_Controller.Optical_Speed_Control.Ki); break;
+				case 39:ANO_DT_Check(*(data_buf + 7), 100 * Total_Controller.Optical_Speed_Control.Kd); break;
+				case 40:ANO_DT_Check(*(data_buf + 7), 1000 * Total_Controller.SDK_Roll_Position_Control.Kp); break;
+				case 41:ANO_DT_Check(*(data_buf + 7), 1000 * Total_Controller.SDK_Roll_Position_Control.Ki); break;
+				case 42:ANO_DT_Check(*(data_buf + 7), 100 * Total_Controller.SDK_Roll_Position_Control.Kd); break;
+				case 43:ANO_DT_Check(*(data_buf + 7), 1000 * Total_Controller.SDK_Pitch_Position_Control.Kp); break;
+				case 44:ANO_DT_Check(*(data_buf + 7), 1000 * Total_Controller.SDK_Pitch_Position_Control.Ki); break;
+				case 45:ANO_DT_Check(*(data_buf + 7), 100 * Total_Controller.SDK_Pitch_Position_Control.Kd); break;
+				case 74:ANO_DT_Check(*(data_buf + 7), 0); break;
+				default:ANO_DT_Check(*(data_buf + 7), 1);      break;
 			}
-			USART1_Send (data_buf, num);
+			
     }
 		    if(*(data_buf+3)==0XE1)		//读取参数请求模块
     {
@@ -590,41 +640,41 @@ void ANO_DT_Send_RCData(u16 thr,u16 yaw,u16 rol,u16 pit,u16 aux1,u16 aux2,u16 au
   USART1_Send(data_to_send, _cnt);
 }
 
-void ANO_DT_Send_GPSData(u8 Fixstate,u8 GPS_Num,u32 log,u32 lat,int16 gps_head)//发送GPS基本信息
-{
-  u8 sum = 0;
-  u8 _cnt=0;
-  u8 i=0;
-  data_to_send[_cnt++]=0xAA;
-	data_to_send[_cnt++]=0x05;
-  data_to_send[_cnt++]=0xAF;
-  data_to_send[_cnt++]=0x04;
-  data_to_send[_cnt++]=0;
-  data_to_send[_cnt++]=Fixstate;
-  data_to_send[_cnt++]=GPS_Num;
-  
-  data_to_send[_cnt++]=BYTE3(log);
-  data_to_send[_cnt++]=BYTE2(log);
-  data_to_send[_cnt++]=BYTE1(log);
-  data_to_send[_cnt++]=BYTE0(log);
-  
-  data_to_send[_cnt++]=BYTE3(lat);
-  data_to_send[_cnt++]=BYTE2(lat);
-  data_to_send[_cnt++]=BYTE1(lat);
-  data_to_send[_cnt++]=BYTE0(lat);
-  
-  data_to_send[_cnt++]=BYTE1(gps_head);
-  data_to_send[_cnt++]=BYTE0(gps_head);
-  
-  data_to_send[4] = _cnt-5;
-  
-  sum = 0;
-  for(i=0;i<_cnt;i++)
-    sum += data_to_send[i];
-  
-  data_to_send[_cnt++]=sum;
-  USART1_Send(data_to_send, _cnt);
-}
+//void ANO_DT_Send_GPSData(u8 Fixstate,u8 GPS_Num,u32 log,u32 lat,int16 gps_head)//发送GPS基本信息
+//{
+//  u8 sum = 0;
+//  u8 _cnt=0;
+//  u8 i=0;
+//  data_to_send[_cnt++]=0xAA;
+//	data_to_send[_cnt++]=0x05;
+//  data_to_send[_cnt++]=0xAF;
+//  data_to_send[_cnt++]=0x04;
+//  data_to_send[_cnt++]=0;
+//  data_to_send[_cnt++]=Fixstate;
+//  data_to_send[_cnt++]=GPS_Num;
+//  
+//  data_to_send[_cnt++]=BYTE3(log);
+//  data_to_send[_cnt++]=BYTE2(log);
+//  data_to_send[_cnt++]=BYTE1(log);
+//  data_to_send[_cnt++]=BYTE0(log);
+//  
+//  data_to_send[_cnt++]=BYTE3(lat);
+//  data_to_send[_cnt++]=BYTE2(lat);
+//  data_to_send[_cnt++]=BYTE1(lat);
+//  data_to_send[_cnt++]=BYTE0(lat);
+//  
+//  data_to_send[_cnt++]=BYTE1(gps_head);
+//  data_to_send[_cnt++]=BYTE0(gps_head);
+//  
+//  data_to_send[4] = _cnt-5;
+//  
+//  sum = 0;
+//  for(i=0;i<_cnt;i++)
+//    sum += data_to_send[i];
+//  
+//  data_to_send[_cnt++]=sum;
+//  USART1_Send(data_to_send, _cnt);
+//}
 void ANO_DT_Send_Power(u16 votage, u16 current)
 {
     u8 _cnt=0;
@@ -740,10 +790,12 @@ void ANO_DT_Send_Udata(s16 a_x,s16 a_y,s16 a_z,s16 g_x,s16 g_y,s16 g_z,s16 m_x,s
     
     USART1_Send(data_to_send, _cnt);
 }
+
+float Power_V;
 void ANO_SEND_StateMachine(void)//各组数据循环发送
 {
 	static int16_t ANO_Cnt=0;
-	u16 Power_V; 
+  float Power=0;
   ANO_Cnt++;
   if(ANO_Cnt%5==0)
   {
@@ -769,8 +821,12 @@ void ANO_SEND_StateMachine(void)//各组数据循环发送
 	}
 	if(ANO_Cnt%50==0)
 	{
-		Power_V=(u16)ADC_StartSample(0);
-		ANO_DT_Send_Power(Power_V,20);
+          Power=ADC_StartSample(0);
+              if(Power>3)	
+              {
+                Power_V=Power;
+              ANO_DT_Send_Power((u16)Power_V,20);
+              }
 	}
   if(ANO_Cnt%150==0)//提前终止发送队列
   {

@@ -2,16 +2,18 @@
 
 extern unsigned char raw_data[14];
 extern short int translated_data[7];     //½«6050µÄÔ­Ê¼14¸öÊý¾Ý»¯Îª7¸ö¶þ½øÖÆÊý¾Ý£¬Ç°Èý¸öÊÇ¼ÓËÙ¶È·Ö±ðÔÚxyzÉÏµÄ·ÖÁ¿£¬×îºóÈý¸öÊÇ½ÇËÙ¶È£¬ÖÐ¼äµÄÊÇÎÂ¶È
+extern float accel[3];
 
-struct PID_parameter PID_pitch  = {1, 2, 1};  //×ËÌ¬½ÇPID
-struct PID_parameter PID_roll   = {1, 3, 1};
-struct PID_parameter PID_yaw    = {1, 1, 1};
 
-struct PID_parameter PID_gyro_x = {1, 1, 1};  //½ÇËÙ¶ÈPID
-struct PID_parameter PID_gyro_y = {1, 1, 1};
-struct PID_parameter PID_gyro_z = {1, 1, 1};
+struct PID_parameter PID_pitch  = {7, 0, 0};  //×ËÌ¬½ÇPID
+struct PID_parameter PID_roll   = {0, 0, 0};
+struct PID_parameter PID_yaw    = {0, 0, 0};
 
-struct PID_parameter PID_height = {1, 1, 1};  //¸ß¶ÈPID
+struct PID_parameter PID_gyro_x = {0.00196, 0, 0.256};  //½ÇËÙ¶ÈPID
+struct PID_parameter PID_gyro_y = {0.00196, 0, 0.256};
+struct PID_parameter PID_gyro_z = {0, 0, 0};
+
+struct PID_parameter PID_height = {0, 0, 0};  //¸ß¶ÈPID
 
 struct Set_value Set;
 
@@ -25,6 +27,8 @@ struct Kalman_data kalman_accel_x = {0.02, 0.001, 0.543, 0};     //ÈýÖáµÄ¼ÓËÙ¶È¿
 struct Kalman_data kalman_accel_y = {0.02, 0.001, 0.543, 0};
 struct Kalman_data kalman_accel_z = {0.02, 0.001, 0.543, 0};
 
+struct Kalman_data kalman_gyro_y = {0.02, 0.001, 0.543, 0};
+
 struct Set_value err[ERR_STORE_NUM] = { {0,0,0,  0,0,0,   0},
 																					{0,0,0,  0,0,0,   0},
 																					{0,0,0,  0,0,0,   0},
@@ -37,6 +41,16 @@ struct Set_value err[ERR_STORE_NUM] = { {0,0,0,  0,0,0,   0},
 																					{0,0,0,  0,0,0,   0} };      //Îó²î´æ´¢
 																								
 struct Set_value err_acc = {0,0,0,  0,0,0,  0};
+
+//***********************************************debug********************************************
+
+struct debug_data debug;
+
+//************************************************************************************************
+
+
+
+
 																							
 int store_pos = 0;      //¸ÃÂÖÎó²î´æ´¢Î»ÖÃ
 																								
@@ -125,14 +139,14 @@ void flight_control(int COMorDMAmode, int COMmode)
 	
 	temp_delta_duty = PID_gyro_y.Kp * err[store_pos].gyro_y
 	                 +PID_gyro_y.Ki * err_acc.gyro_y
-									 +PID_gyro_y.Kd * ( err[store_pos].gyro_y - err[read_position].gyro_y);
+									 -PID_gyro_y.Kd * ( err[store_pos].gyro_y - err[read_position].gyro_y);
 									 
 	temp_delta_duty = limit(temp_delta_duty, LIM_DELTA_DUTY_PITCH_MAX, LIM_DELTA_DUTY_PITCH_MIN);   //¸©Ñö·½ÏòµÄPIDÔöÁ¿ÏÞ·ù
 										 
-	motor_delta_duty[0] += temp_delta_duty;          //¸©Ñö·½ÏòÔöÁ¿
-	motor_delta_duty[1] += temp_delta_duty;
-	motor_delta_duty[2] -= temp_delta_duty;
-	motor_delta_duty[3] -= temp_delta_duty;
+	motor_delta_duty[0] -= temp_delta_duty;          //¸©Ñö·½ÏòÔöÁ¿
+	motor_delta_duty[1] -= temp_delta_duty;
+	motor_delta_duty[2] += temp_delta_duty;
+	motor_delta_duty[3] += temp_delta_duty;
 
 
 	
@@ -142,7 +156,7 @@ void flight_control(int COMorDMAmode, int COMmode)
 	
 	temp_delta_duty = PID_gyro_x.Kp * err[store_pos].gyro_x
 	                 +PID_gyro_x.Ki * err_acc.gyro_x
-									 +PID_gyro_x.Kd * ( err[store_pos].gyro_x - err[read_position].gyro_x);
+									 -PID_gyro_x.Kd * ( err[store_pos].gyro_x - err[read_position].gyro_x);
 									 
 	temp_delta_duty = limit(temp_delta_duty, LIM_DELTA_DUTY_ROLL_MAX, LIM_DELTA_DUTY_ROLL_MIN);   //ºá¹ö·½ÏòµÄPIDÔöÁ¿ÏÞ·ù
 									 
@@ -159,7 +173,7 @@ void flight_control(int COMorDMAmode, int COMmode)
 	
 	temp_delta_duty = PID_gyro_z.Kp * err[store_pos].gyro_z
 	                 +PID_gyro_z.Ki * err_acc.gyro_z
-									 +PID_gyro_z.Kd * ( err[store_pos].gyro_z - err[read_position].gyro_z);
+									 -PID_gyro_z.Kd * ( err[store_pos].gyro_z - err[read_position].gyro_z);
 									 
 	temp_delta_duty = limit(temp_delta_duty, LIM_DELTA_DUTY_YAW_MAX, LIM_DELTA_DUTY_YAW_MIN);   //Æ«º½·½ÏòµÄPIDÔöÁ¿ÏÞ·ù
 									 
@@ -171,7 +185,7 @@ void flight_control(int COMorDMAmode, int COMmode)
 	
 	for(i = 0 ; i < 4 ; i++)     motor_duty[i] += motor_delta_duty[i];      //¼ÆËã×îÖÕÊä³ö
 	
-	duty_runout_adjustment();
+	//duty_runout_adjustment();
 	
 	for(i = 0 ; i < 4 ; i++)     motor_duty[i] = limit(motor_duty[i], DUTY_MAX, DUTY_MIN);
 	
@@ -186,7 +200,7 @@ void MPU6050_get_offset(int mode)
 	{
 		MPU6050_get_data(raw_data, mode);
 		
-		MPU6050_data_translation(raw_data, translated_data, mode);
+		MPU6050_data_translation(raw_data, translated_data);
 		
 		offset.gyro_x += translated_data[4];
 		offset.gyro_y += translated_data[5];
@@ -197,11 +211,15 @@ void MPU6050_get_offset(int mode)
 	offset.gyro_y = offset.gyro_y / 100;
 	offset.gyro_z = offset.gyro_z / 100;
 	
+	offset.gyro_x = 0xFF8B;     //µÃµ½½ÇËÙ¶ÈµÄ¾²Ì¬²âÁ¿Îó²î
+	offset.gyro_y = 0xFFD4;
+	offset.gyro_z = 0xFFFC;
+	
 	for(i = 0 ; i < 100 ; i ++)
 	{
 		MPU6050_get_data(raw_data, mode);
 		
-		MPU6050_data_translation(raw_data, translated_data, mode);
+		MPU6050_data_translation(raw_data, translated_data);
 		
 		translated_data[4] -= offset.gyro_x;         //½ÇËÙ¶È¼õÈ¥¾²Ì¬Æ«²î
 		translated_data[5] -= offset.gyro_y;
@@ -231,15 +249,18 @@ void MPU6050_get_offset(int mode)
 
 void Attitude_process(int COMorDMAmode, int COMmode)
 {
-	if (COMorDMAmode == NDMA_READ) MPU6050_get_data(raw_data, COMmode);      //·ÇDMA·½Ê½¶ÁÈ¡
+	static int errnum = 0;
+	if (COMorDMAmode == COMMON_READ) MPU6050_get_data(raw_data, COMmode);      //³£¹æ¶ÁÈ¡
 	
-	MPU6050_data_translation(raw_data, translated_data, COMmode);
+	MPU6050_data_translation(raw_data, translated_data);
 	
 	if (COMorDMAmode == DMA_READ)    MPU6050_dma_read(MPU6050_ADDRESS, 0x3B);   //DMA·½Ê½¶ÁÈ¡
 	
 	translated_data[4] -= offset.gyro_x;         //½ÇËÙ¶È¼õÈ¥¾²Ì¬Æ«²î
 	translated_data[5] -= offset.gyro_y;
 	translated_data[6] -= offset.gyro_z;
+	
+	//debug.raw_accel = translated_data[1];
 	
 	kalman_filter(&kalman_accel_x, (float)translated_data[0]);    //¶ÔÈýÖá¼ÓËÙ¶È½øÐÐ¿¨¶ûÂüÂË²¨
 	kalman_filter(&kalman_accel_y, (float)translated_data[1]);
@@ -249,11 +270,13 @@ void Attitude_process(int COMorDMAmode, int COMmode)
 	attitude.accel_y = kalman_accel_y.output;
 	attitude.accel_z = kalman_accel_z.output;
 	
+	debug.kalman_accel = kalman_accel_y.output;
+	
 	attitude.gyro_x = translated_data[4];      //´ËÊ±»¹ÊÇ¶þ½øÖÆÊý
 	attitude.gyro_y = translated_data[5];
 	attitude.gyro_z = translated_data[6];	
 	
-	if( COMmode != MPU6050_DMP )   Get_angle(&attitude, 0.00626);
+	Get_angle(&attitude, 0.01);
 	
 	attitude.pitch -= offset.pitch;    //µÃµ½µÄ×ËÌ¬½Ç¼õÈ¥¾²Ì¬Æ«²î
 	attitude.roll  -= offset.roll;
@@ -261,6 +284,8 @@ void Attitude_process(int COMorDMAmode, int COMmode)
 	attitude.gyro_x = attitude.gyro_x * Gyro_G;         //×ª»¯ÎªÊ®½øÖÆ
 	attitude.gyro_y = attitude.gyro_y * Gyro_G;
 	attitude.gyro_z = attitude.gyro_z * Gyro_G;
+	
+	if (attitude.pitch > 90 || attitude.pitch < -90)  errnum ++;
 }
 
 void Get_angle(struct Attitude_float *addr, float dt)
@@ -409,7 +434,7 @@ void flight_control_debug(int DebugMode, float set_value, int COMorDMAmode, int 
 	if(period > ERR_STORE_NUM)  period = ERR_STORE_NUM;   //·ÀÖ¹Êý×éÔ½½ç
 	
 	if(store_pos - (period - 1) >= 0)   read_position = store_pos - (period - 1);   //¼ÆËã¶ÁÈ¡Î»ÖÃ£¨Î¢·ÖÔËËãÒªÓÃ£©
-	else read_position = ERR_STORE_NUM - ((period - 1) - store_pos) + 1;
+	else read_position = ERR_STORE_NUM - ((period - 1) - store_pos);
 	
 	switch (DebugMode)
 	{
@@ -444,14 +469,14 @@ void flight_control_debug(int DebugMode, float set_value, int COMorDMAmode, int 
 		
 		temp_delta_duty = PID_gyro_x.Kp * err[store_pos].gyro_x
 										 +PID_gyro_x.Ki * err_acc.gyro_x
-										 +PID_gyro_x.Kd * ( err[store_pos].gyro_x - err[read_position].gyro_x);
+										 -PID_gyro_x.Kd * ( err[store_pos].gyro_x - err[read_position].gyro_x);
 		
 		temp_delta_duty = limit(temp_delta_duty, LIM_DELTA_DUTY_ROLL_MAX, LIM_DELTA_DUTY_ROLL_MIN);   //ºá¹ö·½ÏòµÄPIDÔöÁ¿ÏÞ·ù
 										 
-		motor_delta_duty[0] -= temp_delta_duty;          //ºá¹ö·½ÏòÔöÁ¿
-		motor_delta_duty[1] += temp_delta_duty;
-		motor_delta_duty[2] += temp_delta_duty;
-		motor_delta_duty[3] -= temp_delta_duty;
+		motor_delta_duty[0] += temp_delta_duty;          //ºá¹ö·½ÏòÔöÁ¿
+		motor_delta_duty[1] -= temp_delta_duty;
+		motor_delta_duty[2] -= temp_delta_duty;
+		motor_delta_duty[3] += temp_delta_duty;
 	}
 	//**************************************************************************************************************************
 	
@@ -481,10 +506,23 @@ void flight_control_debug(int DebugMode, float set_value, int COMorDMAmode, int 
 		
 		temp_delta_duty = limit(temp_delta_duty, LIM_DELTA_DUTY_PITCH_MAX, LIM_DELTA_DUTY_PITCH_MIN);   //¸©Ñö·½ÏòµÄPIDÔöÁ¿ÏÞ·ù
 										 
-		motor_delta_duty[0] += temp_delta_duty;          //¸©Ñö·½ÏòÔöÁ¿
-		motor_delta_duty[1] += temp_delta_duty;
-		motor_delta_duty[2] -= temp_delta_duty;
-		motor_delta_duty[3] -= temp_delta_duty;
+		motor_delta_duty[0] -= temp_delta_duty;          //¸©Ñö·½ÏòÔöÁ¿
+		motor_delta_duty[1] -= temp_delta_duty;
+		motor_delta_duty[2] += temp_delta_duty;
+		motor_delta_duty[3] += temp_delta_duty;
+	}
+	
+	{
+//		debug.last_err = err[read_position].gyro_y;
+//		debug.now_error = err[store_pos].gyro_y;
+//		debug.delta_error = err[store_pos].gyro_y - err[read_position].gyro_y;
+		debug.Kd = PID_pitch.Kd;
+//		debug.Kp = PID_gyro_y.Kp;
+//		debug.Ki = PID_gyro_y.Ki;
+//		debug.temp_duty = temp_delta_duty;
+		debug.temp_duty_Kd = PID_pitch.Kd * ( err[store_pos].pitch - err[read_position].pitch );
+		debug.temp_duty_Kp = PID_pitch.Kp * err[store_pos].pitch;
+		debug.angle = atan2(accel[0], accel[2]);
 	}
 	//**************************************************************************************************************************
 	
@@ -504,7 +542,7 @@ void flight_control_debug(int DebugMode, float set_value, int COMorDMAmode, int 
 		
 		temp_delta_duty = PID_gyro_z.Kp * err[store_pos].gyro_z
 										 +PID_gyro_z.Ki * err_acc.gyro_z
-										 +PID_gyro_z.Kd * ( err[store_pos].gyro_z - err[read_position].gyro_z);
+										 -PID_gyro_z.Kd * ( err[store_pos].gyro_z - err[read_position].gyro_z);
 		
 		temp_delta_duty = limit(temp_delta_duty, LIM_DELTA_DUTY_YAW_MAX, LIM_DELTA_DUTY_YAW_MIN);   //Æ«º½·½ÏòµÄPIDÔöÁ¿ÏÞ·ù
 										 
@@ -517,7 +555,7 @@ void flight_control_debug(int DebugMode, float set_value, int COMorDMAmode, int 
 	
 	for(i = 0 ; i < 4 ; i++)     motor_duty[i] += motor_delta_duty[i];      //¼ÆËã×îÖÕÊä³ö
 	
-	duty_runout_adjustment();
+	//duty_runout_adjustment();
 	
 	for(i = 0 ; i < 4 ; i++)     motor_duty[i] = limit(motor_duty[i], DUTY_MAX, DUTY_MIN);
 	

@@ -1,11 +1,9 @@
 #include "timer.h"
-//#include "hcsr04.h"
-//#include "pwm.h"
-//#include "delay.h"
+#include "hcsr04.h"
+#include "pwm.h"
+#include "delay.h"
 long int cycle = 0;            //程序的运行周期数
-
-struct Sys_flag SYSFLAG;
-	
+struct Status_flag status = {0,0};
 extern float motor_duty[4];
 extern unsigned char raw_data[14];
 extern short int translated_data[7];
@@ -52,32 +50,20 @@ void TIM3_IRQHandler(void)
 	{	
 		TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
 		
-		TIM3_flag = 1;		
+		TIM3_flag = 1;	
 
-		SYSFLAG_update();
-		
+    status.data_send = 1;
+    status.attitude_process = 1;		
+
 		cycle++;
 	}
 }
 
 void timer3_init(void)
 {
-	TIM3_init();
-	
+	TIM3_init();	
 	timer3_nvic_init();
 	TIM_Cmd(TIM3, ENABLE);	
 }
 
-void SYSFLAG_init(void)
-{
-	SYSFLAG.SendDataPermission = 0;
-	SYSFLAG.AttitudeProcessPermission = 0;
-	SYSFLAG.AttitudeProcessOvertimeErr = 0;
-}
-
-void SYSFLAG_update(void)
-{
-	if(SYSFLAG.AttitudeProcessPermission == 1)   SYSFLAG.AttitudeProcessOvertimeErr ++;     //若触发中断时上一轮的姿态解算未完成，超时数自增
-	else SYSFLAG.AttitudeProcessPermission = 1;
-}
 

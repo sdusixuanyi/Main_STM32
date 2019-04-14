@@ -15,6 +15,7 @@ void wust_sendware(unsigned char *wareaddr, int16_t waresize);
 void USART0_Send(uint8_t *pui8Buffer, uint32_t ui32Count);
 void ANO_DT_Data_Receive_Prepare(u8 data);
 void ANO_DT_Data_Receive_Anl(u8 *data_buf,u8 num);
+void ANO_DT_Check(u8 num,u32 _temp2);
 void ANO_SEND_StateMachine(void);
 void Vcan_Send(void);
 extern uint8_t ANO_Send_PID_Flag[6];

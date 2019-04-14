@@ -11,7 +11,7 @@ void QuadShow(void);
 
 extern uint8_t Key_Right_Release;
 extern int16_t Page_Number;
-
+extern 	float Power_V;
 
 #endif
 

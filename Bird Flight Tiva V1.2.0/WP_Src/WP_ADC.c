@@ -26,6 +26,6 @@ float ADC_StartSample(uint8_t num)//ADCªÒ»°
   ADCProcessorTrigger(ADC0_BASE, num); // Trigger the sample sequence.  
   while(!ADCIntStatus(ADC0_BASE, num, false)) ; // Wait until the sample sequence has completed.  
   ADCSequenceDataGet(ADC0_BASE, num, &data_temp);// Read the value from the ADC.    
-  return (float)(data_temp*3.3/4095.0f);   
+  return (float)(data_temp*37/4095.0f);   
 }
 

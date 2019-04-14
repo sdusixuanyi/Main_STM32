@@ -310,11 +310,11 @@ void Gyro_Control()//角速度环
     PID_Control_Div_LPF_For_Gyro(&Total_Controller.Pitch_Gyro_Control);
     PID_Control_Div_LPF_For_Gyro(&Total_Controller.Roll_Gyro_Control);
     
-    Pitch_Gyro_Control_Expect_Delta=1000*(Total_Controller.Pitch_Gyro_Control.Expect-Last_Pitch_Gyro_Control_Expect
-                                          /Total_Controller.Pitch_Gyro_Control.PID_Controller_Dt.Time_Delta);
-    Roll_Gyro_Control_Expect_Delta=1000*(Total_Controller.Roll_Gyro_Control.Expect-Last_Roll_Gyro_Control_Expect
-                                         /Total_Controller.Roll_Gyro_Control.PID_Controller_Dt.Time_Delta);
-    
+    Pitch_Gyro_Control_Expect_Delta=1000*(Total_Controller.Pitch_Gyro_Control.Expect-Last_Pitch_Gyro_Control_Expect)
+                                          /Total_Controller.Pitch_Gyro_Control.PID_Controller_Dt.Time_Delta;
+    Roll_Gyro_Control_Expect_Delta=1000*(Total_Controller.Roll_Gyro_Control.Expect-Last_Roll_Gyro_Control_Expect)
+                                         /Total_Controller.Roll_Gyro_Control.PID_Controller_Dt.Time_Delta;
+    //总控制器/Roll角速度/
     Last_Pitch_Gyro_Control_Expect=Total_Controller.Pitch_Gyro_Control.Expect;
     Last_Roll_Gyro_Control_Expect=Total_Controller.Roll_Gyro_Control.Expect;
     

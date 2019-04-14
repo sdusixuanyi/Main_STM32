@@ -1,7 +1,6 @@
 #ifndef __STMFLASH_H__
 #define __STMFLASH_H__
-//#include "sys.h"  
-#include "headfile.h"
+#include "sys.h"  
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -10,7 +9,10 @@
 #define STM32_FLASH_WREN 1              //使能FLASH写入(0，不是能;1，使能)
 
 
-#define SIZE sizeof(TEXT_Buffer)	 	//计算数组大小
+#define SIZE sizeof(datatemp)	 	//数组长度
+#define FLASH_SAVE_ADDR  0X08020000 	//设置FLASH 保存地址(必须为偶数，且其值要大于本代码所占用FLASH的大小+0X08000000)
+
+//#define SIZE sizeof(TEXT_Buffer)	 	//计算数组大小
 #define FLASH_SAVE_ADDR  0X08020000 	//设置flash保存地址
 //u8 datatemp[SIZE];
 //////////////////////////////////////////////////////////////////////////////////////////////////////
